@@ -1,0 +1,1233 @@
+%---------------------------preamble--------------------------------------
+%-------------------------------------------------------------------------
+%--------------Preamble----------------------------------------------------
+%compile this package with pdflatex
+\documentclass[10pt]{beamer} % default
+%\documentclass[10pt,aspectratio=169]{beamer} % default
+%\documentclass[draft,10pt,aspectratio=169]{beamer} % draft
+%\documentclass[handout,10pt,aspectratio=169]{beamer} % handout
+%-------------------------------------------------------------------------
+% my def
+\definecolor{tuhh_darkcyan}{rgb}{.09,0.39,.42}
+\def\LBOX{\fbox{\begin{minipage}[c][.4cm][c]{.5cm}%
+  \center \large \phantom{1} \qquad\end{minipage}}}
+\newcommand\BOXWF[1]{\fbox{\begin{minipage}[c][.4cm][c]{.5cm}%
+  \center \large {#1}\end{minipage}}}
+% my def
+%-------------------------------------------------------------------------
+%
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[ngerman]{babel}
+\usepackage{ulem}
+\normalem
+\usepackage{bookmark}
+\usepackage{apalike}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Definitions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Colors:
+  \definecolor{myalgcolor}{rgb}{1.0,1.0,0.5}
+  \definecolor{myred}{rgb}{1.0,0.0,0.0}
+  \definecolor{myyellow}{rgb}{1.0,1.0,0.5}
+  \definecolor{mygray}{gray}{0.55}
+  \definecolor{mycyan}{rgb}{.0,.8,1.0}
+  \definecolor{blau}{rgb}{.5,.5,1.0}
+  \definecolor{myerror}{rgb}{1.0,0.0,0.5}
+  \definecolor{myerron}{rgb}{0.4,0.0,0.6}
+\newcommand{\error}[1]{\textcolor{myerror}{{}#1{}}}
+\newcommand{\erron}[1]{\textcolor{myerron}{{}#1{}}}
+\newcommand{\backupbegin}{
+   \newcounter{framenumberappendix}
+   \setcounter{framenumberappendix}{\value{framenumber}}
+}
+\newcommand{\backupend}{
+   \addtocounter{framenumberappendix}{-\value{framenumber}}
+   \addtocounter{framenumber}{\value{framenumberappendix}} 
+}
+\DeclareMathOperator{\diag}{\mathsf{diag}}
+\DeclareMathOperator{\argmin}{\mathsf{argmin}}
+\DeclareMathOperator{\codim}{\mathsf{codim}}
+\DeclareMathOperator{\Rang}{\mathsf{Rang}}
+\DeclareMathOperator{\zeros}{\mathsf{zeros}}
+\newcommand{\bfnu}{\boldsymbol{\nu}}
+\newcommand{\bfhatnu}{\boldsymbol{\widehat{\nu}}}
+\newcommand{\bfchecknu}{\boldsymbol{\check{\nu}}}
+\DeclareMathOperator{\sut}{\mathsf{sut}}
+\DeclareMathOperator{\tril}{\mathsf{tril}}
+\DeclareMathOperator{\triu}{\mathsf{triu}}
+\renewcommand{\diag}{\mathsf{diag}}
+\DeclareMathOperator{\diagm}{\mathsf{diag}}
+\DeclareMathOperator{\trace}{\mathsf{trace}}
+\DeclareMathOperator{\sign}{\mathsf{sign}}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Definitions added by Jens-Peter Zemke
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% my own stuff
+%%
+%% definition of perlis mathclap etcpp.
+%%
+% For comparison, the existing overlap macros:
+% \def\llap#1{\hbox to 0pt{\hss#1}}
+% \def\rlap#1{\hbox to 0pt{#1\hss}}
+\def\clap#1{\hbox to 0pt{\hss#1\hss}}
+\def\mathllap{\mathpalette\mathllapinternal}
+\def\mathrlap{\mathpalette\mathrlapinternal}
+\def\mathclap{\mathpalette\mathclapinternal}
+\def\mathllapinternal#1#2{%
+  \llap{$\mathsurround=0pt#1{#2}$}}
+\def\mathrlapinternal#1#2{%
+  \rlap{$\mathsurround=0pt#1{#2}$}}
+\def\mathclapinternal#1#2{%
+  \clap{$\mathsurround=0pt#1{#2}$}}
+%%
+%% end of perlis stuff
+%%
+%%
+%% definition of inverse diagonal dots (iddots)
+%%
+\makeatletter
+\def\iddots{\mathinner{\mkern1mu\raise\p@%
+    \hbox{.}\mkern2mu\raise4\p@\hbox{.}\mkern2mu%
+    \raise7\p@\vbox{\kern7\p@\hbox{.}}\mkern1mu}}
+\makeatother
+%%%\def\ddots{\mathinner{\mkern1mu\raise7\p@\vbox%
+%%%{\kern7\p@\hbox{.}} \mkern2mu\raise4\p@\hbox{.}%
+%%%\mkern2mu\raise\p@\hbox{.}\mkern1mu}}
+%
+% TIME OF DAY (Nelson H. F. Beebe :-)
+%
+\newcount\hh
+\newcount\mm
+\mm=\time
+\hh=\time
+\divide\hh by 60
+\divide\mm by 60
+\multiply\mm by 60
+\mm=-\mm
+\advance\mm by \time
+\def\hhmm{\number\hh:\ifnum\mm<10{}0\fi\number\mm}
+%
+% Use it like this in a LaTeX document:
+%
+%        \date{\today{ }\hhmm}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% kleiner Hack, um Einträge in Matrizen anders auszurichten
+%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\makeatletter
+\renewcommand*\env@matrix[1][*\c@MaxMatrixCols c]{%
+  \hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{#1}}
+\makeatother
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% Wir wollen Matlab-Beispielprogramme einbinden
+%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{listings}
+\definecolor{hellgrau}{rgb}{0.90,0.90,0.90}
+\definecolor{commentcol}{rgb}{0.0823,.4902,0.0}
+\lstset{language=Matlab,
+        basicstyle={\footnotesize\ttfamily},
+        keywordstyle={\sffamily\bfseries},
+        tabsize=2,
+        escapechar=\#,
+        numbers=left,
+        numberstyle=\tt,
+        stepnumber=1,
+        numbersep=7pt,
+        breaklines=true,
+        frame=single,
+        frameround=ffff,
+        commentstyle=\color{commentcol},
+        backgroundcolor=\color{hellgrau}
+}
+\usepackage{algorithmic}
+\renewcommand{\algorithmiccomment}[2]{\hfill\rlap{\texttt{\%
+      #1}}\phantom{\texttt{\% #2}}}
+\renewcommand{\algorithmicrequire}{\textsc{Eingabe:}}
+\renewcommand{\algorithmicensure}{\textsc{Ausgabe:}}
+\usepackage{algorithm}
+\floatname{algorithm}{Algorithmus}
+
+\mode<presentation>
+{
+  \usetheme{ABMATH}
+  \useinnertheme{default}
+  \setbeamercovered{invisible}
+  \usefonttheme[onlymath]{serif}
+  \setbeamertemplate{items}[triangle]
+  \setbeamertemplate{sections/subsections in toc}[default]
+  \setbeamercolor*{author in head/foot}{parent=palette secondary}
+}
+\setbeamerfont{quote}{shape=\upshape}
+\usepackage{pgf}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage{graphicx}
+\usepackage{pifont}
+\usepackage{colortbl}
+\usepackage{xmpmulti}
+\usepackage{multimedia}
+\usepackage{pdfpages}
+\usepackage{tikz}
+\usepackage{pgfplots}
+
+\newcommand{\bfA}{{\mathbf A}}
+\newcommand{\bfB}{{\mathbf B}}
+\newcommand{\bfC}{{\mathbf C}}
+\newcommand{\bfD}{{\mathbf D}}
+\newcommand{\bfE}{{\mathbf E}}
+\newcommand{\bfF}{{\mathbf F}}
+\newcommand{\bfG}{{\mathbf G}}
+\newcommand{\bfH}{{\mathbf H}}
+\newcommand{\bfI}{{\mathbf I}}
+\newcommand{\bfJ}{{\mathbf J}}
+\newcommand{\bfK}{{\mathbf K}}
+\newcommand{\bfL}{{\mathbf L}}
+\newcommand{\bfM}{{\mathbf M}}
+\newcommand{\bfN}{{\mathbf N}}
+\newcommand{\bfO}{{\mathbf O}}
+\newcommand{\bfP}{{\mathbf P}}
+\newcommand{\bfQ}{{\mathbf Q}}
+\newcommand{\bfR}{{\mathbf R}}
+\newcommand{\bfS}{{\mathbf S}}
+\newcommand{\bfT}{{\mathbf T}}
+\newcommand{\bfU}{{\mathbf U}}
+\newcommand{\bfV}{{\mathbf V}}
+\newcommand{\bfW}{{\mathbf W}}
+\newcommand{\bfX}{{\mathbf X}}
+\newcommand{\bfY}{{\mathbf Y}}
+\newcommand{\bfZ}{{\mathbf Z}}
+\newcommand{\bfa}{{\mathbf a}}
+\newcommand{\bfb}{{\mathbf b}}
+\newcommand{\bfc}{{\mathbf c}}
+\newcommand{\bfd}{{\mathbf d}}
+\newcommand{\bfe}{{\mathbf e}}
+\newcommand{\bff}{{\mathbf f}}
+\newcommand{\bfg}{{\mathbf g}}
+\newcommand{\bfh}{{\mathbf h}}
+\newcommand{\bfi}{{\mathbf i}}
+\newcommand{\bfj}{{\mathbf j}}
+\newcommand{\bfk}{{\mathbf k}}
+\newcommand{\bfl}{{\mathbf l}}
+\newcommand{\bfm}{{\mathbf m}}
+\newcommand{\bfn}{{\mathbf n}}
+\newcommand{\bfo}{{\mathbf o}}
+\newcommand{\bfp}{{\mathbf p}}
+\newcommand{\bfq}{{\mathbf q}}
+\newcommand{\bfr}{{\mathbf r}}
+\newcommand{\bfs}{{\mathbf s}}
+\newcommand{\bft}{{\mathbf t}}
+\newcommand{\bfu}{{\mathbf u}}
+\newcommand{\bfv}{{\mathbf v}}
+\newcommand{\bfw}{{\mathbf w}}
+\newcommand{\bfx}{{\mathbf x}}
+\newcommand{\bfy}{{\mathbf y}}
+\newcommand{\bfz}{{\mathbf z}}
+\newcommand{\bfell}{{\boldsymbol\ell}}
+\newcommand{\bfSigma}{{\boldsymbol\Sigma}}
+\newcommand{\DEF}{:=}
+\newcommand{\FED}{=:}
+\newcommand{\DEFM}[1]{\textcolor{red}{#1}}
+\newcommand{\T}{\mathsf{T}}
+\renewcommand{\H}{\mathsf{H}}
+\newcommand{\Span}{\mathop{\mathsf{span}}}
+\newcommand{\spec}{\mathop{\mathsf{spec}}}
+
+%%% thanks, Nick Higham :)
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[absolute,overlay]{textpos}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%% my own packages %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[Kurzer Titel]%
+{Vom Sinn und Nutzen eines Proseminares,
+  auch bekannt als <langer Titel>}
+
+\author[Jens-Peter M. Zemke]%
+{%
+  \href{https://www.mat.tuhh.de/home/jpmzemke}%
+          {Jens-Peter M. Zemke}\break
+  \footnotesize{\href{mailto:zemke@tu-harburg.de}%
+                {zemke@tu-harburg.de}}%
+}
+
+\titlegraphic{%
+  \includegraphics[height=.15\textheight]%
+    {pics/TUHH_de}%
+}
+
+\institute{\href{https://www.mat.tuhh.de/}{%
+            Institut für Mathematik}\\
+            Lehrstuhl Numerische Mathematik\\
+           \href{https://www.tuhh.de/}{%
+            Technische Universität Hamburg}%
+}
+
+\date[2017-04-03]{\footnotesize{3. April 2017}}
+
+\AtBeginSubsection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Übersicht}
+    \tableofcontents[currentsection,currentsubsection]
+%    \tableofcontents[currentsection]
+  \end{frame}
+}
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Übersicht}
+%    \tableofcontents[currentsection,currentsubsection]
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+%---------------------------preamble-----------------------------------
+\hypersetup{%
+  pdftitle     = {},
+  pdfsubject   = {},
+  pdfkeywords  = {},
+  pdfauthor    = {\textcopyright\ Jens-Peter M. Zemke, März 2017}, 
+  % pdfpagemode  = FullScreen
+%  colorlinks = true,
+%  linkcolor = ,
+%  urlcolor = blue,
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Frontmatter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%----------------------------begin frame-------------------------------
+\begin{frame}
+  \titlepage
+\end{frame}
+%----------------------------end frame---------------------------------
+\usebackgroundtemplate{%
+      \includegraphics[width=\paperwidth]{pics/Background}}
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{Übersicht}
+  \tableofcontents[pausesections]
+\end{frame}
+%----------------------------end frame--------------------------------
+\section{Grundlegendes}
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{Das Wichtigste in Kürze}
+
+  Eckdaten:
+  \begin{itemize}
+  \item<1-> Titel: „Proseminar über numerische lineare Algebra“
+  \item<2-> Literatur: Buch \cite{Watkins:2002} von David Watkins
+  \item<3-> Teilnehmer: maximal 36 Abschnitte $\leadsto$ maximal 36
+  \item<4-> Treffen: Montag, 17:00--18:30, Channel Harburg, CH4-0.08
+  \item<5-> 3 Vorträge pro Treffen
+  \end{itemize}
+
+  \vspace*{1em}
+
+\uncover<6->{%
+  Anforderungen:
+  \begin{itemize}
+  \item<7-> \LaTeX-Ausarbeitung (3--15 Seiten)
+  \item<8-> \textsc{Matlab}-Beispielprogramme
+  \item<9->  Vortrag auf Basis der \LaTeX-Beamer-Klasse (30\,min)
+  \item<10-> Anwesenheit bei den Vorträgen
+  \end{itemize}}
+
+\end{frame}
+%----------------------------end frame--------------------------------
+\subsection{Das mathematische Thema}
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{Thema}
+  
+  Thema $\leadsto$ erste Kapitel des Buches~\cite{Watkins:2002},
+  “Fundamentals of Matrix Computations”:
+
+  \vspace*{1em}
+
+  \begin{itemize}[<+->]
+  \item Gauß'sches Eliminationsverfahren,
+  \item Sensitivität linearer Gleichungssysteme,
+  \item Ausgleichsprobleme,
+  \item Singulärwertzerlegung (SVD),
+  \item Eigenwerten und Eigenvektoren,
+  \item (iterative Methoden zur Lösung linearer Gleichungssysteme).
+  \end{itemize}
+
+\end{frame}
+%----------------------------end frame--------------------------------
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{Kapitel 1: Gauß/LR}
+
+  \begin{tabular}{|r|l|l|}\hline
+  \textbf{No.} & \textbf{Name} & \textbf{Thema} \\\hline
+  \multicolumn{3}{|l|}{Kapitel 1: Gaussian Elimination and Its Variants.}\\\hline
+    \textcolor{blue}{1}&&
+  1.1 Matrix Multiplication.\\\hline
+    \textcolor{blue}{2}&&
+  1.2 Systems of Linear Equations.\\\hline
+    \textcolor{blue}{3}&&
+  1.3 Triangular Systems.\\\hline
+    \textcolor{red}{4}&&
+  1.4 Positive Definite Systems; Cholesky Decomposition.\\\hline
+    \textcolor{red}{5}&&
+  1.5 Banded Positive Definite Systems.\\\hline
+    \textcolor{red}{6}&&
+  1.6 Sparse Positive Definite Systems.\\\hline
+    \textcolor{black}{7}&&
+  1.7 Gaussian Elimination and the LU Decomposition.\\\hline
+    \textcolor{black}{8}&&
+  1.8 Gaussian Elimination with Pivoting.\\\hline
+    \textcolor{black}{9}&&
+  1.9 Sparse Gaussian Elimination.\\\hline
+  \end{tabular}
+
+\end{frame}
+% ----------------------------end frame--------------------------------
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{Kapitel 2: Sensitivität von $\bfA\bfx=\bfb$}
+
+  \begin{tabular}{|r|l|l|}\hline
+  \textbf{No.} & \textbf{Name} & \textbf{Thema} \\\hline
+  \multicolumn{3}{|l|}{Kapitel 2: Sensitivity of Linear Systems.}\\\hline
+    \textcolor{blue}{10}&&
+  2.1 Vector and Matrix Norms.\\\hline
+    \textcolor{blue}{11}&&
+  2.2 Condition Numbers.\\\hline
+    \textcolor{blue}{12}&&
+  2.3 Perturbing the Coefficient Matrix.\\\hline
+    \textcolor{red}{13}&&
+  2.4 A Posteriori Error Analysis Using the Residual.\\\hline
+    \textcolor{red}{14}&&
+  2.5 Roundoff Errors; Backward Stability.\\\hline
+    \textcolor{red}{15}&&
+  2.6 Propagation of Roundoff Errors.\\\hline
+    \textcolor{black}{16}&&
+  2.7 Backward Error Analysis of Gaussian Elimination.\\\hline
+    \textcolor{black}{17}&&
+  2.8 Scaling.\\\hline
+    \textcolor{black}{18}&&
+  2.9 Componentwise Sensitivity Analysis.\\\hline
+  \end{tabular}
+
+\end{frame}
+% ----------------------------end frame--------------------------------
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{Kapitel 3: Ausgleichsprobleme $\min\|\bfA\bfx-\bfb\|_2$}
+  
+  \begin{tabular}{|r|l|l|}\hline
+  \textbf{No.} & \textbf{Name} & \textbf{Thema} \\\hline
+  \multicolumn{3}{|l|}{Kapitel 3: The Least Squares Problem.}\\\hline
+    \textcolor{blue}{19}&&
+  3.1 The Discrete Least Squares Problem.\\\hline
+    \textcolor{blue}{20}&&
+  3.2 Orthogonal Matrices, Rotators and Reflectors.\\\hline
+    \textcolor{blue}{21}&&
+  3.3 Solution of the Least Squares Problem.\\\hline
+    \textcolor{red}{22}&&
+  3.4 The Gram-Schmidt Process.\\\hline
+    \textcolor{red}{23}&&
+  3.5 Geometric Approach.\\\hline
+    \textcolor{red}{24}&&
+  3.6 Updating the QR Decomposition.\\\hline
+  \end{tabular}
+
+\end{frame}
+% ----------------------------end frame--------------------------------
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{Kapitel 4: SVD $\bfA=\bfU\bfSigma\bfV^{\mathsf{H}}$}
+  
+  \begin{tabular}{|r|l|l|}\hline
+  \textbf{No.} & \textbf{Name} & \textbf{Thema} \\\hline
+  \multicolumn{3}{|l|}{Kapitel 4: The Singular Value Decomposition.}\\\hline
+    \textcolor{black}{25}&&
+  4.1 Introduction.\\\hline
+    \textcolor{black}{26}&&
+  4.2 Some Basic Applications of Singular Values.\\\hline
+    \textcolor{black}{27}&&
+  4.3 The SVD and the Least Squares Problem.\\\hline
+    \textcolor{blue}{28}&&
+  4.4 Sensitivity of the Least Squares Problem.\\\hline
+  \end{tabular}
+
+\end{frame}
+% ----------------------------end frame--------------------------------
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{Kapitel 5: Eigenwerte und Eigenvektoren
+    $\bfA\bfv=\bfv\lambda$}
+
+  \begin{tabular}{|r|l|l|}\hline
+  \textbf{No.} & \textbf{Name} & \textbf{Thema} \\\hline
+  \multicolumn{3}{|l|}{Kapitel 5: Eigenvalues and Eigenvectors I.}\\\hline
+    \textcolor{blue}{29}&&
+  5.1 Systems of Differential Equations.\\\hline
+    \textcolor{blue}{30}&&
+  5.2 Basic Facts.\\\hline
+    \textcolor{red}{31}&&
+  5.3 The Power Method and Some Simple Extensions.\\\hline
+    \textcolor{red}{32}&&
+  5.4 Similarity Transforms.\\\hline
+    \textcolor{red}{33}&&
+  5.5 Reduction to Hessenberg and Tridiagonal Forms.\\\hline
+    \textcolor{black}{34}&&
+  5.6 The QR Algorithm.\\\hline
+    \textcolor{black}{35}&&
+  5.7 Use of the QR Algorithm to Calculate Eigenvectors.\\\hline
+    \textcolor{black}{36}&&
+  5.8 The SVD Revisted.\\\hline
+  \end{tabular}
+
+\end{frame}
+%----------------------------end frame--------------------------------
+\subsection{Die Ausarbeitung in \LaTeX}
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{\TeX, \LaTeX, Formeln}
+
+  \begin{description}
+  \item[\LaTeX:] Makros von Leslie Lamport zu
+  \item[\TeX:] Textsatzsystem von Donald Knuth
+  \end{description}
+
+  \vspace*{1em}
+
+\uncover<2->{%
+  \LaTeX\ perfekt geeignet für mathematische Texte:
+  \begin{itemize}
+  \item Formeln: $f(x):=x^2-\sin(x)$,
+  \item Terme: $\int_0^1f(x)\,dx$.
+  \end{itemize}}
+
+  \vspace*{1em}
+
+\uncover<3->{%
+  Abgesetzte nummerierte Formeln:
+  \begin{equation}
+    \label{eq:eine_erste_abgesetzte_Formel}
+    \begin{pmatrix}
+      1 & 2 & 3\\
+      4 & 5 & 6\\
+      7 & 8 & 9\\
+    \end{pmatrix}
+    \begin{pmatrix}[r]
+      1 \\ -2 \\ 1\\
+    \end{pmatrix} = 
+    \begin{pmatrix}
+      0 \\ 0 \\ 0\\
+    \end{pmatrix} \quad\Leftrightarrow\quad
+    \bfA\bfx=\bfo.
+  \end{equation}}
+
+\uncover<4->{%
+  \begin{itemize}
+  \item Zugriff mittels \texttt{\textbackslash eqref}:
+    Formel~\eqref{eq:eine_erste_abgesetzte_Formel},
+  \item schöner mittels Hinzunahme von \texttt{\textbackslash
+      hyperref}:
+         \hyperref[eq:eine_erste_abgesetzte_Formel]%
+    {Formel~(\ref*{eq:eine_erste_abgesetzte_Formel})}.
+  \end{itemize}}
+
+\end{frame}
+% ----------------------------end frame--------------------------------
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{Formeln \& Nummerierung}
+
+  Mehrere Formeln gruppieren $\leadsto$ \texttt{align}:
+  \begin{align}
+    \label{eq:erste_Zeile_gruppierter_Formeln}
+    a(x) &= x^2+4, & b(x) &= x^3-4x^2, \\
+    \label{eq:zweite_Zeile_gruppierter_Formeln}
+    c(x) &= x^2+x, & d(x) &= x^3+13, \\
+    \label{eq:dritte_Zeile_gruppierter_Formeln}
+    e(x) &= x^2+4x, & f(x) &= x^5-12x^3.
+  \end{align}
+\uncover<2->{%
+  Alle Zeilen eigene Formelnummer, unterdrücken mittels
+  \texttt{\textbackslash notag}.
+
+  \begin{enumerate}
+  \item die erste Zeile hat die
+    Nummer~\eqref{eq:erste_Zeile_gruppierter_Formeln},
+  \item die zweite Zeile hat die
+    Nummer~\eqref{eq:zweite_Zeile_gruppierter_Formeln}.
+  \end{enumerate}}
+
+\uncover<3->{%
+  Nummern zusammenfassen $\leadsto$ \texttt{subequations}:
+  \begin{subequations}
+  \label{eq:gruppierte_Formeln}
+    \begin{align}
+      \label{eq:erste_Zeile_gruppierter_Formeln_a}
+      a(x) &= x^2+4, & b(x) &= x^3-4x^2, \\
+      \label{eq:zweite_Zeile_gruppierter_Formeln_b}
+      c(x) &= x^2+x, & d(x) &= x^3+13, \\
+      \label{eq:dritte_Zeile_gruppierter_Formeln_c}
+      e(x) &= x^2+4x, & f(x) &= x^5-12x^3.
+    \end{align}
+  \end{subequations}
+
+  Zweite Zeile:~\eqref{eq:zweite_Zeile_gruppierter_Formeln_b},
+  gesamter Formelblock:~\eqref{eq:gruppierte_Formeln}.}
+
+\end{frame}
+%----------------------------end frame--------------------------------
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{Tabellen, mehrspaltiges Layout}
+
+  \begin{columns}[onlytextwidth]
+    \column{.5\textwidth}
+    Tabellen mittels \texttt{tabular}, wie
+    \begin{center}
+      \begin{tabular}{|l|c|}\hline
+        \textbf{Name} & \textbf{Gruppe} \\\hline\hline
+        Eduard & 4 \\\hline
+        Alexander & 2 \\\hline
+      \end{tabular},
+    \end{center}
+    sind auch möglich.
+
+   \vspace*{1em}
+
+\uncover<2->{%
+    Mathematische Tabellen sind mittels \texttt{array} im Mathemodus
+    zu setzen,
+    \[
+      \begin{array}{|c|l|}\hline
+        n/2 & \text{$n$ gerade}\\\hline
+        3n+1 & \text{$n$ ungerade}\\\hline
+      \end{array}.
+    \]}
+
+    \column{.5\textwidth}
+\uncover<3->{%
+    Es ist ziemlich leicht, in Beamer mehrspaltigen Text zu
+    setzen. Dieser Text ist in der zweiten Spalte.}
+  \end{columns}
+
+  \vspace*{1em}
+
+\uncover<4->{%
+  Dieser (etwas längere) Text ist außerhalb des zweispaltigen
+  Textsatzes.}
+
+\end{frame}
+% ----------------------------end frame--------------------------------
+%----------------------------begin frame------------------------------
+\begin{frame}[fragile]
+  \frametitle{\LaTeX\ \& Bilder}
+
+  In \LaTeX\ möglich, Bilder zu erzeugen oder einzubinden:
+  \begin{description}
+  \item[Einbinden:] $\leadsto$ \textsc{Matlab} (später),
+  \item[Zeichnen:] $\leadsto$ PGF/TikZ.
+  \end{description}
+
+  \vspace*{1em}
+
+  Innerhalb des Textes / einer Formel:
+  \tikz[baseline=1pt,scale=.7]{%
+  \draw[->] (-.1,0)--(.4,0);
+  \draw[->] (0,-.1)--(0,.4);
+  \fill[green]
+    (0,0)--(.3,.3)--(.3,0)--cycle;
+  \draw[thick] (0,0)--(.3,.3)--(.3,0)--cycle;
+  \draw (-.1,-.1)--(.4,.4);
+  } oder
+  \[
+    \int_0^1 x\,dx =
+    \tikz[baseline=1pt,scale=.7]{%
+    \draw[->] (-.1,0)--(.4,0);
+    \draw[->] (0,-.1)--(0,.4);
+    \fill[green]
+      (0,0)--(.3,.3)--(.3,0)--cycle;
+    \draw[thick] (0,0)--(.3,.3)--(.3,0)--cycle;
+    \draw (-.1,-.1)--(.4,.4);
+    } = \frac{1}{2}.
+  \]
+
+\begin{verbatim}
+  \tikz[baseline=1pt,scale=.7]{%
+  \draw[->] (-.1,0)--(.4,0);
+  \draw[->] (0,-.1)--(0,.4);
+  \fill[green]
+    (0,0)--(.3,.3)--(.3,0)--cycle;
+  \draw[thick] (0,0)--(.3,.3)--(.3,0)--cycle;
+  \draw (-.1,-.1)--(.4,.4);
+}
+\end{verbatim}
+  \begin{textblock*}{5cm}(9.2cm,4.7cm)
+\only<2>{%
+  \tikz[baseline=1pt,scale=1]{%
+  \draw[->] (-.1,0)--(.4,0);
+  \draw[->] (0,-.1)--(0,.4);
+  \fill[green]
+    (0,0)--(.3,.3)--(.3,0)--cycle;
+  \draw[thick] (0,0)--(.3,.3)--(.3,0)--cycle;
+  \draw (-.1,-.1)--(.4,.4);
+}}%
+\only<3>{%
+  \tikz[baseline=1pt,scale=2]{%
+  \draw[->] (-.1,0)--(.4,0);
+  \draw[->] (0,-.1)--(0,.4);
+  \fill[green]
+    (0,0)--(.3,.3)--(.3,0)--cycle;
+  \draw[thick] (0,0)--(.3,.3)--(.3,0)--cycle;
+  \draw (-.1,-.1)--(.4,.4);
+}}%
+\only<4>{%
+  \tikz[baseline=1pt,scale=3]{%
+  \draw[->] (-.1,0)--(.4,0);
+  \draw[->] (0,-.1)--(0,.4);
+  \fill[green]
+    (0,0)--(.3,.3)--(.3,0)--cycle;
+  \draw[thick] (0,0)--(.3,.3)--(.3,0)--cycle;
+  \draw (-.1,-.1)--(.4,.4);
+}}%
+\only<5>{%
+  \tikz[baseline=1pt,scale=4]{%
+  \draw[->] (-.1,0)--(.4,0);
+  \draw[->] (0,-.1)--(0,.4);
+  \fill[green]
+    (0,0)--(.3,.3)--(.3,0)--cycle;
+  \draw[thick] (0,0)--(.3,.3)--(.3,0)--cycle;
+  \draw (-.1,-.1)--(.4,.4);
+}}%
+\only<6>{%
+  \tikz[baseline=1pt,scale=5]{%
+  \draw[->] (-.1,0)--(.4,0);
+  \draw[->] (0,-.1)--(0,.4);
+  \fill[green]
+    (0,0)--(.3,.3)--(.3,0)--cycle;
+  \draw[thick] (0,0)--(.3,.3)--(.3,0)--cycle;
+  \draw (-.1,-.1)--(.4,.4);
+}}
+  \end{textblock*}
+
+\end{frame}
+% ----------------------------end frame--------------------------------
+%----------------------------begin frame------------------------------
+\begin{frame}[fragile]
+  \frametitle{Schach gefällig?}
+  
+  \begin{verbatim}
+  \tikz[baseline=1.9cm,scale=0.4]{
+    \foreach \x in {0,...,7} \foreach \y in {0,...,7}
+    {
+      \pgfmathparse{int(mod(\x+\y,2))}
+      \ifnum\pgfmathresult=0{\draw[fill] (\x,\y)
+        rectangle (\x+1,\y+1);}
+      \else{\draw (\x,\y)
+        rectangle (\x+1,\y+1);}
+      \fi
+    }
+  }
+  \end{verbatim}
+  \vspace*{-4.5em}
+  \begin{figure}[htb]
+    \begin{center}
+    \tikz[baseline=1.9cm,scale=0.4]{
+      \foreach \x in {0,...,7} \foreach \y in {0,...,7}
+      {
+        \pgfmathparse{int(mod(\x+\y,2))}
+        \ifnum\pgfmathresult=0{\draw[fill] (\x,\y)
+          rectangle (\x+1,\y+1);}
+        \else{\draw (\x,\y)
+          rectangle (\x+1,\y+1);}
+        \fi
+      }
+    }
+    \end{center}
+    \caption{\label{Abb:Schach} Ein Schachbrett mittels PGF/TikZ.}
+  \end{figure}
+
+\end{frame}
+%----------------------------end frame--------------------------------
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{Algorithmen}
+
+  \setcounter{algorithm}{0} % sonst haben wir auf jeder Folie einen
+                            % neuen Algorithmus :)
+  \begin{algorithm}[H]
+  \caption{Das klassische Gram-Schmidt-Verfahren%
+    \label{alg:CGS}}
+  \begin{algorithmic}[1]
+    \REQUIRE $\bfA\in\mathbb{R}^{m\times n}$ mit $\Rang(\bfA)=n$.
+    \ENSURE $\bfQ\in\mathbb{R}^{m\times n}$ orthonormal,
+    $\bfR\in\mathbb{R}^{n\times n}$ Dreiecksmatrix, $\bfA=\bfQ\bfR$.
+    \STATE \alert<2>{$[m,n] \leftarrow \textsf{size}(\bfA)$;}
+    \STATE \alert<3>{$\bfQ \leftarrow \zeros(m,n)$;}
+    \STATE \alert<4>{$\bfR \leftarrow \zeros(n)$;}
+    \FOR{$k = 1:n$}
+      \STATE \alert<5,9>{$\bfR(1:k-1,k) \leftarrow
+        \bfQ(1:m,1:k-1)^{\mathsf{T}}\bfA(1:m,k)$;}
+      \COMMENT{$r_{j,k}=\bfq_j^{\mathsf{T}}\bfa_k$}%
+              {$r_{j,k}=\bfq_j^{\mathsf{T}}\bfa_k$}%
+      \STATE \alert<6,10>{$\bfv \leftarrow \bfA(1:m,k)-
+        \bfQ(1:m,1:k-1)\bfR(1:k-1,k)$;}
+      \COMMENT{$\bfv\perp\bfq_1,\ldots$}%
+              {$r_{j,k}=\bfq_j^{\mathsf{T}}\bfa_k$}%
+      \STATE \alert<7,11>{$\bfR(k,k) \leftarrow \textsf{norm}(\bfv)$;}
+      \COMMENT{Berechne Norm $r_{k,k}$ des Vektors}%
+              {Berechne Norm $r_{k,k}$ des Vektors}%
+      \STATE \alert<8,12>{$\bfQ(1:m,k) \leftarrow \bfv/\bfR(k,k)$;}
+      \COMMENT{Normalisiere $\bfq_k$}%
+              {Berechne Norm $r_{k,k}$ des Vektors}%
+    \ENDFOR
+  \end{algorithmic}
+\end{algorithm}
+
+\end{frame}
+%----------------------------end frame--------------------------------
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{Automatismen}
+
+  Warum \LaTeX?
+  \begin{itemize}
+  \item<1-> \LaTeX\ setzt automatisch Zeilen- und Wortumbrüche.
+  \item<2-> \LaTeX\ nummeriert alles für mich.
+  \item<3-> \LaTeX\ setzt automatisch mein Literaturverzeichnis.
+  \item<4-> \only<4>{\LaTeX\ schreibt automatisch meine
+      Arbeiten.}\only<5->{\sout{\LaTeX\ schreibt automatisch meine
+      Arbeiten.}}
+  \end{itemize}
+
+  \vspace*{2em}
+
+\uncover<6->{%
+  Literaturverzeichnis erstellen $\leadsto$ BibTeX mit Datei
+  \texttt{.bib}. Woher Einträge?}
+
+\end{frame}
+%----------------------------end frame--------------------------------
+%----------------------------begin frame------------------------------
+\begin{frame}[fragile]
+  \frametitle{Literaturverzeichnis}
+
+  \texttt{.bib}-Einträge:
+
+  \begin{quotation}
+    \url{http://ams.org/mref}.
+  \end{quotation}
+
+  Kopierter Text:\vspace*{-.6em}
+\begin{semiverbatim}\tiny
+  Linear Algebra and its Applications
+  Volume 447, 15 April 2014, Pages 119-132
+  An augmented analysis of the perturbed two-sided Lanczos
+    tridiagonalization process
+  Christopher C. Paige, Ivo Panayotov, Jens-Peter M. Zemke
+\end{semiverbatim}
+
+  Bei MRef eingeben, Knopf \texttt{BibTeX} drücken:\vspace*{-.6em}
+\begin{semiverbatim}\tiny
+@article \{MR3200211,
+    AUTHOR = \{Paige, Christopher C. and Panayotov, Ivo and Zemke, Jens-Peter
+              M.\},
+     TITLE = \{An augmented analysis of the perturbed two-sided \{L\}anczos
+              tridiagonalization process\},
+   JOURNAL = \{Linear Algebra Appl.\},
+  FJOURNAL = \{Linear Algebra and its Applications\},
+    VOLUME = \{447\},
+      YEAR = \{2014\},
+     PAGES = \{119--132\},
+      ISSN = \{0024-3795\},
+   MRCLASS = \{65F15 (15A21 65G50)\},
+  MRNUMBER = \{3200211\},
+MRREVIEWER = \{Rafikul Alam\},
+       DOI = \{10.1016/j.laa.2013.05.009\},
+       URL = \{http://dx.doi.org/10.1016/j.laa.2013.05.009\},
+\}
+\end{semiverbatim}
+  \vspace*{-.6em}
+  In BibTeX-Datei hineinkopieren, modifizieren, fertig.
+
+\end{frame}
+%----------------------------end frame--------------------------------
+\subsection{Die Programmierung in \textsc{Matlab}}
+%----------------------------begin frame------------------------------
+\begin{frame}[fragile]
+  \frametitle{Die Programmierumgebung \textsc{Matlab}}
+
+  \textsc{Matlab} bietet schnellen \& interaktiven Weg, um einfache
+  Rechnungen der numerischen linearen Algebra durchzuführen.
+
+  \vspace*{1em}
+  
+  \textsc{Matlab} = \textsc{Mat}rix \textsc{lab}oratory
+
+  \vspace*{1em}
+
+  Hauptdatentyp: Matrix, Beispiel $\bfA\in\mathbb{R}^{3\times3}$:
+\begin{verbatim}
+  A = [1 2 3;4 5 6;7 8 9]
+\end{verbatim}
+  (Auf Einheitslänge normierte) Lösung des homogenen
+  Gleichungssystems:
+\begin{verbatim}
+  n = null(A)
+\end{verbatim}
+  Umskalieren:
+\begin{verbatim}
+  x = n/n(1)
+\end{verbatim}
+
+\end{frame}
+%----------------------------end frame--------------------------------
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{Die Programmiersprache \textsc{Matlab}}
+
+  \textsc{Matlab} erlaubt Schleifen, Verzweigungen, Funktionen, \ldots:
+  \vspace*{-1em}
+
+  \begin{quotation}
+    \lstinputlisting[caption=Der QR-Algorithmus nach Francis]%
+      {matlab/FrancisAlgorithmus.m}
+  \end{quotation}
+
+\end{frame}
+%----------------------------end frame--------------------------------
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{\textsc{Matlab}: Schnelle Hilfe}
+
+  Implementierte Techniken der linearen Algebra:
+  \begin{itemize}
+  \item LR-Zerlegung $\leadsto$ \texttt{lu},
+  \item QR-Zerlegung $\leadsto$ \texttt{qr},
+  \item $\bfA\bfx=\bfb$ und $\min_{\bfx}\|\bfA\bfx-\bfb\|_2$
+    $\leadsto$ $\bfA$\textbackslash$\,\bfb$,
+  \item Norm $\leadsto$ \texttt{norm},
+  \item Eigenwerte $\leadsto$ \texttt{eig},
+  \item SVD $\leadsto$ \texttt{svd}.
+  \end{itemize}
+
+  \vspace*{1em}
+
+\uncover<2->{%
+  Passende Funktion finden:
+  \begin{quotation}
+    \texttt{lookfor} \textsf{<Suchbegriff>}
+  \end{quotation}}
+
+  \vspace*{1em}
+
+\uncover<3->{%
+  Hilfe zu Programmen mittels
+  \begin{quotation}
+    \texttt{help} \textsf{<Begriff>}
+  \end{quotation}}
+
+\end{frame}
+%----------------------------end frame--------------------------------
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{Grcar-Matrix: \texttt{eig} vs. unser Programm}
+
+  \vspace*{-1em}
+  \begin{quotation}
+    \lstinputlisting[caption=Eigenwertberechnung und graphische
+      Darstellung]{matlab/EigenwertBild.m}
+  \end{quotation}
+
+\end{frame}
+%----------------------------end frame--------------------------------
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{\textsc{Matlab} kann auch schwarz \ldots}
+
+  \begin{center}
+    \includegraphics%
+      [width=\textwidth,height=.8\textheight,keepaspectratio]%
+      {pics/Eigenwerte}
+  \end{center}
+
+\end{frame}
+%----------------------------end frame--------------------------------
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{Von Pseudo-Code zu \textsc{Matlab}}
+
+  Natürlich können wir auch den gezeigten Pseudo-Code in
+  \textsc{Matlab} implementieren, hier ist das Ergebnis:
+  \begin{quotation}
+    \lstinputlisting[caption=Implementation des klassischen
+    Gram-Schmidt'schen Orthonormalisierungsverfahrens]%
+    {matlab/KlassischesGramSchmidtVerfahren.m}
+  \end{quotation}
+
+\end{frame}
+%----------------------------end frame--------------------------------
+%----------------------------begin frame------------------------------
+\begin{frame}[fragile]
+  \frametitle{Verwendung des Programms nebst Ausgabe}
+
+  {\footnotesize
+  \begin{semiverbatim}
+  >> \alert<1>{A = [2 2;2 1;1 0]}
+  A =
+       2     2
+       2     1
+       1     0
+\uncover<2->{  >> \alert<2>{[Q,R] = KlassischesGramSchmidtVerfahren(A)}
+  Q =
+       6.66666666666666\alert<5>{6}e-01     6.666666666666667e-01
+       6.66666666666666\alert<5>{6}e-01    -3.333333333333333e-01
+       3.333333333333333e-01    -6.66666666666666\alert<5>{6}e-01
+  R =
+       3     2
+       0     1}
+\uncover<3->{  >> \alert<3>{Q*R}
+  ans =
+       2     2
+       2     1
+       1     0}
+\uncover<4->{  >> \alert<4>{Q'*Q}
+  ans =
+       1.000000000000000e+00     \alert<5>{1.110223024625157e-16}
+       \alert<5>{1.110223024625157e-16}     1.000000000000000e+00}
+  \end{semiverbatim}}
+
+\end{frame}
+%----------------------------end frame--------------------------------
+\section{Aufbau der Ausarbeitung}
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{Grober Aufbau}
+
+  \begin{itemize}
+  \item Erster Abschnitt:
+  \end{itemize}
+  \begin{quote}
+  \begin{itemize}
+  \item in das Thema adäquat einführen ($\leadsto$ Einführung),
+  \item die behandelten Themen motivieren ($\leadsto$ Motivation),
+  \item die verwendete Notation erläutern ($\leadsto$ Notation).
+  \end{itemize}
+  \end{quote}
+  \begin{itemize}
+  \item Folgende/r Abschnitt/e: wesentlichen Gedanken.
+  \item Gesonderter Abschnitt: numerische Beispiele.
+  \item Abschluss: Fazit nebst Ausblick.
+  \end{itemize}
+
+\end{frame}
+%----------------------------end frame--------------------------------
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{Inhaltsverzeichnis}
+
+  Ein mögliches Inhaltsverzeichnis sieht wie folgt aus:
+
+  \begin{itemize}
+  \item Einführung
+    \begin{itemize}
+    \item Motivation
+    \item Notation
+    \end{itemize}
+  \item Die wesentliche Idee 1
+  \item Die wesentliche Idee 2
+  \item Numerische Beispiele
+  \item Fazit
+  \item Literaturverzeichnis
+  \end{itemize}
+
+\end{frame}
+%----------------------------end frame--------------------------------
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{Plagiate vermeiden!}
+  
+  Klarstellen, ob Behauptung von Ihnen oder Zitat:
+  \begin{quotation}\noindent
+    \llap{„}Watkins~\cite[Seite~18]{Watkins:2002} behauptet, dass
+    viele physikalische Phänomene durch Differentialgleichungen
+    modelliert werden können.“
+  \end{quotation}
+
+\uncover<2->{%
+  \begin{itemize}
+  \item Aussage falsch $\leadsto$ Sie auf der sicheren Seite.
+  \item Nicht Lorbeeren für Arbeit anderer einheimsen $\leadsto$
+    Plagiat.
+  \item Aber: In Einführung Ihren Anteil an Ergebnissen klarstellen!
+  \end{itemize}}
+
+  \vspace*{1em}
+
+\uncover<3->{%
+  Hilfsmittel wie Wikipedia zitieren:
+  \begin{quotation}\noindent
+    \url{https://de.wikipedia.org/wiki/Zitieren_von_Internetquellen}.
+  \end{quotation}
+  Zitieren von Internetquellen unbeliebt $\leadsto$ besser
+  Lehrbücher/Journale.}
+
+\end{frame}
+%----------------------------end frame--------------------------------
+\section{Aufbau eines wissenschaftlichen Vortrages }
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{Goldene Regeln}
+
+  \begin{itemize}
+  \item 5-7 Zeilen pro Folie
+  \item 2 Minuten pro Folie einplanen
+  \item keine ausgefeilten Sätze, nur Stichworte
+  \item nicht alles vorlesen, Zuhörer können meist lesen
+  \item ein Drittel für alle, ein Drittel für Wissende, ein Drittel
+    für Spezialisten
+  \item “abc-xyz-rule” (englisch)
+  \end{itemize}
+
+
+\end{frame}
+%----------------------------end frame--------------------------------
+\section{Hilfreiche Internet-Quellen}
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{\LaTeX \& \textsc{Matlab}}
+
+  \LaTeX, \TeX:
+  \begin{description}
+  \item[\href{http://www.latex-project.org/}%
+             {http://www.latex-project.org/}] -- \LaTeX-Projekt
+  \item[\href{https://www.ctan.org/starter}%
+             {https://www.ctan.org/starter}] -- Kurzeinführung
+  \item[\href{http://www.tug.org/begin.html}%
+             {http://www.tug.org/begin.html}] -- längere
+             Kurzeinführung
+  \item[\href{https://www.dante.de/tex/TeXAnfaenger.html}%
+             {https://www.dante.de/tex/TeXAnfaenger.html}] -- Start
+             mit \LaTeX
+  \item[\href{http://tex.stackexchange.com/}%
+             {http://tex.stackexchange.com/}] -- Fragenportal zu \TeX\
+             \& \LaTeX
+  \end{description}
+
+  \vspace*{1em}
+
+  \textsc{Matlab}
+  \begin{description}
+  \item[\href{https://de.mathworks.com/products/matlab.html}%
+             {https://de.mathworks.com/products/matlab.html}] --
+             \textsc{Matlab}-Hauptseite
+  \item[\href{https://de.mathworks.com/matlabcentral/fileexchange/}%
+             {https://de.mathworks.com/matlabcentral/fileexchange/}]
+             -- Quelle hilfreicher Implementationen \& netter Gimmicks
+  \item[\href{https://www.tuhh.de/rzt/software/numerik/matlab/matlab-tsh.html}%
+             {https://www.tuhh.de/rzt/software/numerik/matlab/matlab-tsh.html}]
+             -- TUHH-Seite zur Installation von \textsc{Matlab} für
+             Studierende
+  \end{description}
+
+\end{frame}
+%----------------------------end frame--------------------------------
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{Fazit \& Ausblick}
+
+  Fazit:
+
+  \begin{itemize}
+  \item Jetzt sollte hier ein sinniges Fazit stehen.
+  \item Sie sollten zumindest einen deutlich kürzeren Vortrag halten.
+  \end{itemize}
+
+  \vspace*{1em}
+
+\uncover<2->{%
+  Ausblick:
+
+  \begin{itemize}
+  \item Wir werden hoffentlich viele schöne Vorträge sehen und einiges
+    lernen, am meisten über (und für) uns selbst.
+  \end{itemize}}
+
+\end{frame}
+%----------------------------end frame--------------------------------
+\appendix
+\backupbegin
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{Appendix}
+
+  Im Appendix können Sie
+  \begin{itemize}
+  \item Formeln,
+  \item Beweise,
+  \item Pseudo-Code,
+  \item \ldots
+  \end{itemize}
+  sammeln, von denen Sie denken, dass dazu eine Frage auftauchen
+  könnte.
+
+  \vspace*{1em}
+
+  (Dies wird in der Seitenzählung nicht angezeigt $\leadsto$ keiner
+  erschrickt sich.)
+
+  \vspace*{1em}
+
+  Ich verwende den Appendix strategisch meist für die folgenden zwei
+  Dinge:
+
+\end{frame}
+%----------------------------end frame--------------------------------
+%----------------------------begin frame------------------------------
+\begin{frame}
+  \frametitle{Dankeschön!}
+
+\selectlanguage{ngerman}
+
+  \Large
+  \begin{center}
+    Vielen Dank für die Aufmerksamkeit!
+
+    \vspace*{3em}
+    
+    \uncover<2->{(Möge Ihr Vortrag ein guter sein.)}
+  \end{center}
+
+\end{frame}
+%----------------------------end frame--------------------------------
+\begin{frame}
+  \frametitle{Literatur}
+
+  \bibliography{Proseminar}
+  \bibliographystyle{apalike}
+
+\end{frame}
+
+\backupend
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

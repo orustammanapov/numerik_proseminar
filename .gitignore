@@ -1,0 +1,14 @@
+**/*.pdf
+**/*.aux
+**/*.bbl
+**/*.blg
+**/*.loa
+**/*.lof
+**/*.log
+**/*.lot
+**/*.nav
+**/*.out
+**/*.snm
+**/*.toc
+**/*.vrb
+unterlagen/*

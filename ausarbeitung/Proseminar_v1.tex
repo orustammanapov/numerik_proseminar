@@ -1,0 +1,633 @@
+\documentclass[a4paper]{article}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% Zuerst laden wir ein paar nützliche Pakete
+%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% AMS-Pakete: mathematische Fonts
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{amsmath}
+\usepackage{amssymb}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Babel-Paket: Silbentrennung (Deutsch/neue Rechtschtreibung)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[english,ngerman]{babel}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% fontenc & inputenc: Umlaute in UTF8 eingeben
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% graphicx: Graphiken einbinden
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{graphicx}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% color: farbige Texte, Hintergründe, Links, etcpp.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{color}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% tikz/pgfplots: Bilder in LaTeX zeichnen
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathmorphing,patterns,calc}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.12}
+\usepackage{calculus}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% geometry: bessere Ausnutzung des verfügbaren Platzes
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[a4paper,includeheadfoot,margin=2.54cm]{geometry}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% epstopdf: automatische Umwandlung von EPS nach PDF
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{epstopdf}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% Nun definieren wir ein paar hilfreiche Dinge
+%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Generelles Umstellen des Doppelpunktes auf dieselbe
+% Linie wie das Gleichheitszeichen. Aus de-tex-faq, Teil 8,
+% Makro von Donald Arseneau
+%
+\mathchardef\ordinarycolon\mathcode`\:
+\mathcode`\:=\string"8000
+\begingroup \catcode`\:=\active
+  \gdef:{\mathrel{\mathop\ordinarycolon}}
+\endgroup
+%%
+%% definition of Perlis mathclap etcpp.
+%%
+% For comparison, the existing overlap macros:
+% \def\llap#1{\hbox to 0pt{\hss#1}}
+% \def\rlap#1{\hbox to 0pt{#1\hss}}
+\def\clap#1{\hbox to 0pt{\hss#1\hss}}
+\def\mathllap{\mathpalette\mathllapinternal}
+\def\mathrlap{\mathpalette\mathrlapinternal}
+\def\mathclap{\mathpalette\mathclapinternal}
+\def\mathllapinternal#1#2{%
+  \llap{$\mathsurround=0pt#1{#2}$}}
+\def\mathrlapinternal#1#2{%
+  \rlap{$\mathsurround=0pt#1{#2}$}}
+\def\mathclapinternal#1#2{%
+  \clap{$\mathsurround=0pt#1{#2}$}}
+%%
+%% end of perlis stuff
+%%
+%%
+%% definition of inverse diagonal dots (iddots)
+%%
+\makeatletter
+\def\iddots{\mathinner{\mkern1mu\raise\p@%
+    \hbox{.}\mkern2mu\raise4\p@\hbox{.}\mkern2mu%
+    \raise7\p@\vbox{\kern7\p@\hbox{.}}\mkern1mu}}
+\makeatother
+%%%\def\ddots{\mathinner{\mkern1mu\raise7\p@\vbox%
+%%%{\kern7\p@\hbox{.}} \mkern2mu\raise4\p@\hbox{.}%
+%%%\mkern2mu\raise\p@\hbox{.}\mkern1mu}}
+%
+% TIME OF DAY (Nelson H. F. Beebe :-)
+%
+\newcount\hh
+\newcount\mm
+\mm=\time
+\hh=\time
+\divide\hh by 60
+\divide\mm by 60
+\multiply\mm by 60
+\mm=-\mm
+\advance\mm by \time
+\def\hhmm{\number\hh:\ifnum\mm<10{}0\fi\number\mm}
+%
+% Use it like this in a LaTeX document:
+%
+%        \date{\today{ }\hhmm}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% Wir definieren Makros für fette Buchstaben
+%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% small bold letters
+\newcommand{\bfa}{{\mathbf a}}
+\newcommand{\bfb}{{\mathbf b}}
+\newcommand{\bfc}{{\mathbf c}}
+\newcommand{\bfd}{{\mathbf d}}
+\newcommand{\bfe}{{\mathbf e}}
+\newcommand{\bff}{{\mathbf f}}
+\newcommand{\bfg}{{\mathbf g}}
+\newcommand{\bfh}{{\mathbf h}}
+\newcommand{\bfi}{{\mathbf i}}
+\newcommand{\bfj}{{\mathbf j}}
+\newcommand{\bfk}{{\mathbf k}}
+\newcommand{\bfl}{{\mathbf l}}
+\newcommand{\bfm}{{\mathbf m}}
+\newcommand{\bfn}{{\mathbf n}}
+\newcommand{\bfo}{{\mathbf o}}
+\newcommand{\bfp}{{\mathbf p}}
+\newcommand{\bfq}{{\mathbf q}}
+\newcommand{\bfr}{{\mathbf r}}
+\newcommand{\bfs}{{\mathbf s}}
+\newcommand{\bft}{{\mathbf t}}
+\newcommand{\bfu}{{\mathbf u}}
+\newcommand{\bfv}{{\mathbf v}}
+\newcommand{\bfw}{{\mathbf w}}
+\newcommand{\bfx}{{\mathbf x}}
+\newcommand{\bfy}{{\mathbf y}}
+\newcommand{\bfz}{{\mathbf z}}
+%%% capital bold letters
+\newcommand{\bfA}{{\mathbf A}}
+\newcommand{\bfAT}{{\mathbf A}\kern-.15em^{\mathsf{T}}}
+\newcommand{\bfB}{{\mathbf B}}
+\newcommand{\bfC}{{\mathbf C}}
+\newcommand{\bfD}{{\mathbf D}}
+\newcommand{\bfE}{{\mathbf E}}
+\newcommand{\bfF}{{\mathbf F}}
+\newcommand{\bfG}{{\mathbf G}}
+\newcommand{\bfH}{{\mathbf H}}
+\newcommand{\bfI}{{\mathbf I}}
+\newcommand{\bfJ}{{\mathbf J}}
+\newcommand{\bfK}{{\mathbf K}}
+\newcommand{\bfL}{{\mathbf L}}
+\newcommand{\bfM}{{\mathbf M}}
+\newcommand{\bfN}{{\mathbf N}}
+\newcommand{\bfO}{{\mathbf O}}
+\newcommand{\bfP}{{\mathbf P}}
+\newcommand{\bfQ}{{\mathbf Q}}
+\newcommand{\bfR}{{\mathbf R}}
+\newcommand{\bfS}{{\mathbf S}}
+\newcommand{\bfT}{{\mathbf T}}
+\newcommand{\bfU}{{\mathbf U}}
+\newcommand{\bfV}{{\mathbf V}}
+\newcommand{\bfW}{{\mathbf W}}
+\newcommand{\bfX}{{\mathbf X}}
+\newcommand{\bfY}{{\mathbf Y}}
+\newcommand{\bfZ}{{\mathbf Z}}
+%% extra bold symbols
+\newcommand{\bfell}{{\boldsymbol{\ell}}}
+\newcommand{\bfLambda}{{\boldsymbol{\Lambda}}}
+\newcommand{\bfSigma}{{\boldsymbol{\Sigma}}}
+\newcommand{\bfnu}{{\boldsymbol{\nu}}}
+\newcommand{\bfphi}{{\boldsymbol{\phi}}}
+\newcommand{\bfalpha}{{\boldsymbol{\alpha}}}
+\newcommand{\bfbeta}{{\boldsymbol{\beta}}}
+\newcommand{\bfhatbeta}{{\boldsymbol{\widehat{\beta}}}}
+\newcommand{\bfomega}{{\boldsymbol{\omega}}}
+\newcommand{\bfrho}{{\boldsymbol{\rho}}}
+\newcommand{\bfmu}{{\boldsymbol{\mu}}}
+\newcommand{\bfchecknu}{{\boldsymbol{\check{\nu}}}}
+\newcommand{\bfhatnu}{{\boldsymbol{\widehat{\nu}}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% Zum Setzen von Sätzen, Beweisen, Lemmata, Definitionen
+%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{amsthm}
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}%[section]
+\newtheorem{corollary}[theorem]{Korollar}%[section]
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}%[section]
+\newtheorem{remark}[theorem]{Bemerkung}%[section]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% Mathematische Operatoren in \textsf
+%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\det}{\mathop{\mathsf{det}}}
+\newcommand{\adj}{\mathop{\mathsf{adj}}}
+\renewcommand{\dim}{\mathop{\mathsf{dim}}}
+\renewcommand{\deg}{\mathop{\mathsf{deg}}}
+\renewcommand{\max}{\mathop{\mathsf{max}}}
+\renewcommand{\min}{\mathop{\mathsf{min}}}
+\newcommand{\argmin}{\mathop{\mathsf{arg\ min}}}
+\newcommand{\diag}{\mathop{\mathsf{diag}}}
+\newcommand{\triu}{\mathop{\mathsf{triu}}}
+\newcommand{\tril}{\mathop{\mathsf{tril}}}
+\newcommand{\ones}{\mathop{\mathsf{ones}}}
+\newcommand{\zeros}{\mathop{\mathsf{zeros}}}
+\newcommand{\eye}{\mathop{\mathsf{eye}}}
+\newcommand{\conj}{\mathop{\mathsf{conj}}}
+\newcommand{\norm}{\mathop{\mathsf{norm}}}
+\newcommand{\Mod}{\mathop{\mathsf{mod}}}
+\newcommand{\spdiags}{\mathop{\mathsf{spdiags}}}
+\newcommand{\circshift}{\mathop{\mathsf{circshift}}}
+\newcommand{\fliplr}{\mathop{\mathsf{fliplr}}}
+\newcommand{\logical}{\mathop{\mathsf{logical}}}
+\newcommand{\Summe}{\mathop{\mathsf{sum}}}
+\newcommand{\sign}{\mathop{\mathsf{sign}}}
+\newcommand{\cumprod}{\mathop{\mathsf{cumprod}}}
+\renewcommand{\limsup}{\mathop{\mathsf{lim\ sup}}}
+\newcommand{\spur}{\mathop{\mathsf{spur}}}
+\renewcommand{\vec}{\mathop{\mathsf{vec}}}
+\newcommand{\spec}{\mathop{\mathsf{spec}}}
+\newcommand{\speceps}{\mathop{\mathsf{spec}_{\epsilon}}}
+\newcommand{\Bild}{\mathop{\mathsf{Bild}}}
+\newcommand{\Kern}{\mathop{\mathsf{Kern}}}
+\newcommand{\Span}{\mathop{\mathsf{span}}}
+\newcommand{\Index}{\mathop{\mathsf{Index}}}
+\newcommand{\Rang}{\mathop{\mathsf{Rang}}}
+% hack for seto = searrow in small
+\newcommand{\seto}{\mathop{\scalebox{.5}{$\searrow$}}}
+\newcommand{\neto}{\mathop{\scalebox{.5}{$\nearrow$}}}
+% end of hack for seto = searrow in small
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% kleiner Hack, um Einträge in Matrizen anders auszurichten
+%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\makeatletter
+\renewcommand*\env@matrix[1][*\c@MaxMatrixCols c]{%
+  \hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{#1}}
+\makeatother
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% Wir wollen Matlab-Beispielprogramme einbinden
+%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{listings}
+\definecolor{hellgrau}{rgb}{0.90,0.90,0.90}
+\definecolor{commentcol}{rgb}{0.0823,.4902,0.0}
+\lstset{language=Matlab,
+        basicstyle={\footnotesize\ttfamily},
+        keywordstyle={\sffamily\bfseries},
+        tabsize=2,
+        escapechar=\#,
+        numbers=left,
+        numberstyle=\tt,
+        stepnumber=1,
+        numbersep=7pt,
+        breaklines=true,
+        frame=single,
+        frameround=ffff,
+        commentstyle=\color{commentcol},
+        backgroundcolor=\color{hellgrau}
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% Wir wollen verlinkte PDF-Dateien, dazu ein paar Zeilen
+%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{ifpdf}
+\ifpdf
+\usepackage[pdftex]{hyperref}
+\usepackage{thumbpdf}
+\else
+\usepackage[dvips,ps2pdf,naturalnames]{hyperref}
+\fi
+\definecolor{mycolor}{rgb}{.08,.12,.71}
+\hypersetup{%
+  pdftitle     = {Proseminar über numerische lineare Algebra},
+  pdfsubject   = {Proseminar Mathematik},
+  pdfkeywords  = {Proseminar, Mathematik, numerische lineare Algebra,
+    TUHH},
+  pdfauthor    = {\textcopyright\ Jens-Peter M. Zemke 2017},
+  baseurl      = {http://www.mat.tuhh.de/home/jpmzemke/},
+  pdfstartview = {FitH},
+  pdfview      = {FitH},
+  linkcolor    = mycolor,     % links to same page
+  urlcolor     = mycolor,     % links to URLs
+  citecolor    = mycolor,     % links to citations
+  breaklinks   = true,       % links may (line) break
+  colorlinks   = true,
+  citebordercolor=0 0 0,  % color for \cite
+  filebordercolor=0 0 0,
+  linkbordercolor=0 0 0,
+  menubordercolor=0 0 0,
+  urlbordercolor=0 0 0,
+  pdfhighlight=/P,   % moeglich /I, /P, ...
+  pdfborder=0 0 0,   % keine Box um die Links!
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% Zum Setzen von Algorithmen
+%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{algorithmic}
+\renewcommand{\algorithmiccomment}[2]{\hfill\rlap{\texttt{\%
+      #1}}\phantom{\texttt{\% #2}}}
+\renewcommand{\algorithmicrequire}{\textsc{Eingabe:}}
+\renewcommand{\algorithmicensure}{\textsc{Ausgabe:}}
+\usepackage[Algorithmus]{algorithm}
+\numberwithin{algorithm}{section}
+%%%
+\usepackage{hypcap}
+\renewcommand{\hypcapspace}{0pt}
+
+\newcommand{\mnorm}[1]{\left\lVert#1\right\rVert}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% … endlich geht es los!
+%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+\begin{document}
+
+\title{\Huge \textbf{Gaußsches Eliminationsverfahren mit Pivotisierung}}
+\author{\textsc{Rustam Magomedov}}
+\date{\today}
+\maketitle%
+\tableofcontents%
+\newpage
+
+
+%========================================
+\phantomsection
+\addcontentsline{toc}{section}{Algorithmenverzeichnis}%
+\listof{algorithm}{Algorithmenverzeichnis}%
+\newpage
+
+
+%========================================
+\section{Einführung}
+\label{sec:introduction}
+In dieser Ausarbeitung werden wir uns mit den unterschiedlichen Pivotisierungsverfahren, die in der Numerische Linearen Algebra eine wichtige Rolle spielen, beschäftigen. Dies werden wir mithilfe des im Proseminar vorgestellten Buches (Watkins), des Skripts und mithilfe einiger Internetquellen, die unter dem Literaturverzeichnis aufgelistet sind, tun. Die Ausareitung ist in drei Abschnitte aufgeteilt um die strukturierte Behandlung des Themas zu ermöglichen. Im ersten Abschnitt werden wir erfahren welche Motivation hinter diesen Verfahren steckt und werden ein Paar wichtige Begriffe, die uns im dritten Abschnitt bei der Auswertung helfen werden, kennen lernen. Im zweiten Abschnitt schauen wir uns die Verfahren näher an und machen uns mit den Algorithmen vertraut. Wie schon vorher erwähnt, werden wir im letzten Abschnitt dieser Ausarbeitung die, nun bekannten, Verfahren auswerten und miteinander vergleichen.
+
+
+%========================================
+\subsection{Motivation}
+\label{sec:motivation}
+LR-Zerlegung stellt ein gutes, numerisches Verfahren dar und ist beim lösen eines eindeutig lösbaren Gleichungssystems, wo eine reguläre Matrix auftritt, kaum ersetzbar, jedoch hat auch LR-Zerlegung ihre Nachteile. Ein typisches Beispiel, bei dem LR-Zerlegung nicht anwendbar ist, ist eine reguläre Matrix mit einer Null in der Diagonale, zwar ist diese Matrix regulär, es lässt sich aber trotzdem kein sinnvolles Ergebnis ohne weiteres erschließen. Ein anschauliches Beispiel dazu:
+
+\begin{verbatim}
+>> A = [0 2 -3; 2 2 1; 2 4 4]
+A =
+     0    2   -3
+     2    2    1
+     2    4    4
+
+>> det(A)
+ans = -24
+
+\end{verbatim}
+
+
+%========================================
+\subsection{Rechnergenauigkeit}
+\label{sec:precision}
+Ein weiterer Grund, warum es ohne eine weitere Methode nicht geht und neue Lösungsverfahren von essentieller Bedeutung sind, sind die physikalischen Eigenschaften moderner Rechner. Eine reelle Zahl lässt zwar auf dem Blatt Papier verhältnismässig einfach darstellen, wobei es selbst hier sich um eine begrenzte Anzahl der Nachkommastellen handeln muss, sind die Speicherkapazitäten eines Rechners für manche mathematischen Operationen sehr begrenzt. Dies führt wiederum zu kreativen Speicherformaten und einer dieser Formate ist das IEEE-Format. Das IEEE-Format bringt nicht nur bessere Speicherverwaltung mit, indem es erlaubt Gleitkommazahlen besser zu speichern, sondern auch Rundungsfehler, was sich am folgenden Beispiel anschaulich darstellen lässt:
+
+\begin{equation}
+  \bfA=\bfL\bfR
+  \quad\Rightarrow\quad
+  \begin{pmatrix}
+    10^{-20}  & 1 \\
+    1         & 1 \\
+  \end{pmatrix}=
+  \begin{pmatrix}
+    1         & 0 \\
+    10^{20}   & 1 \\
+  \end{pmatrix}
+  \begin{pmatrix}
+    10^{-20}  & 1 \\
+    0         & 1-10^{20} \\
+  \end{pmatrix}
+\end{equation}
+\newline
+
+wo $\bfA$ eine reguläre Matrix mit einer LR-Zerlegung ist, bei der $\bfL$ eine normierte untere und $\bfR$ eine rechte obere Dreiecksmatrix ist.
+In diesem Beispiel entsteht ein Problem bei dem $r_{22}$-Eintrag der $\bfR$-Matrix. Wird man die beiden Matrizen $\bfL$ und $\bfR$ ausmutipliezeren, so wird man nicht auf die ursprüngliche Matrix $\bfA$ kommen, weil der $r_{22}$-Eintrag einen falschen Wert, der durch Rundungsfehler entsteht, liefert.
+
+
+%========================================
+\subsection{Begriffe}
+\label{sec:concepts}
+Um die Störungsempfindlichkeit der Verfahren auszuwerten führen wir neue Begriffe ein, diese Begriffe sollen die Grundlage, die der Auswertung dieser Verfahren dient, bilden. Erster Begriff, den wir einführen ist die Konditionszahl, die ein Maß für die Störungsschwankung des Problems ist, und der zweite Begriff ist die Wachstumsfaktor, und dieser soll als Maß für die Stabilität (Stärke der Störungsschwankung des numerischen Algorithmus).
+\newline
+\newline
+Die Konditionszahl ist definiert als: $$\kappa(A)=\mnorm{A^{-1}}\mnorm{A},$$
+\newline
+wo $\bfA$ eine reguläre Matrix und $\mnorm{\cdot}$ eine definierte Matrixnorm ist, von der die Konditionszahl abhängt.
+\newline
+Je kleiner ist die Konditionszahl, desto besser. Bei einer Konditionszahl $\epsilon\kappa(A) \sim 1$, wo $\epsilon$ relativer Maschinengenauigkeit ist, kann man keine brauchbare Lösung erwarten
+\newline
+\newline
+Der Wachstumsfactor ist definiert als: $$\rho_k=^{\max\limits_{i,j} \left|r_{i,j}\right|}/_{\max\limits_{i,j} \left|a_{i,j}\right|},$$
+\newline
+wo $k$ für den Algorithmusschritt und $r_{i,j}$ und $a_{i,j}$ für entsprechende Einträge der $\bfA$ und $\bfR$ Matrizen stehen. Dabei gehen wir von der gängigen Konvention aus, bei der $\bfA$ eine reguläre Startmatrix und $\bfR$ eine obere Dreiecksmatrix ist. Auch bei dem Wachstumsfaktor heißt es je kleiner, desto besser.
+\newpage
+
+
+%========================================
+\section{Verfahren}
+\label{sec:methods}
+In diesem Abschnitt der Ausarbeitung machen wir uns mit den drei Pivotisierungsmethoden bekannt und schauen uns die algorithmische Vorgehensweise dieser Methoden.
+
+
+%========================================
+\subsection{Partielle Pivotisierung}
+\label{sec:partial_pivoting}
+Die Partielle Pivotisierung, die auch als Spaltenpivotsuche bekannt ist, ist die einfachste und die am meisten verbreitetste Methode der Pivot-Suche. Bei dieser Methode sucht man das betragsmäßig gröste Element, um es mit dem aktuellen Pivot-Element auszutauschen. Die Suche startet in der aktuellen Spalte und unter dem aktuellen Pivot-Element. Findet man das betragsmäßig größere Element, so tauscht man die Zeile mit dem betragsgrößten Element mit der Zeile des aktuellen Pivot-Elements um und speichert die Tauschoperation in einer Pivot-Matrix oder, wenn man es effizienter speichern möchte, in einem Pivot-Vektor. Diese Vorgehensweise wiederholt man solange bis man am letzten Pivot-Element landet, hier hört die Suche auf, da es keine weiteren Elemente mehr darunter gibt.
+
+\begin{algorithm}
+\caption{Partielle Pivotisierung%
+  \label{alg:partial_pivoting}}
+  \begin{algorithmic}[1]
+    % Ein- und Ausgabe
+    \REQUIRE $\bfA\in\mathbb{R}^{n\times n}$ mit $\Rang(\bfA)=n$, $\bfP\in\mathbb{R}^{n\times n}$.
+    \ENSURE $\bfL\in\mathbb{R}^{n\times n}$ untere Dreiecksmatrix, $\bfR\in\mathbb{R}^{n\times n}$ obere Dreiecksmatrix.
+    % Initialisierung
+    \STATE $[n,n] \leftarrow \textsf{size}(\bfA)$;
+    \STATE $\bfR \leftarrow \bfA$, $\bfL \leftarrow \bfP \leftarrow \textsf{eye}(n,n)$;
+    % Schleife
+    \FOR{$k = 1:n-1$}
+      % Finde betragsmäßig maximales Element
+      \STATE $[a_{max},i_{max}] \leftarrow \max\limits_{k \leq i \leq n}\{|a_{i,k}|\}$
+      % Zeilenaustausch
+      \IF{$i_{max} \neq k$}
+        \STATE $\bfR([k\textsf{ }i_{max}],:) \leftarrow \bfR([i_{max}\textsf{ }k],:)$
+        \STATE $\bfP([k\textsf{ }i_{max}],:) \leftarrow \bfP([i_{max}\textsf{ }k],:)$
+      \ENDIF
+      % Berechnung der Koeffizienten-Spalte in der L-Matrix
+      \STATE $\bfL(k+1:n,k) \leftarrow \bfR(k+1:n,k)/a_{max}$
+      % Berechnung der Zeile in der R-Matrix
+      \STATE $\bfR(k+1:n,k:n) \leftarrow \bfR(k+1:n,k:n) - \bfL(k+1:n,k:n).*\bfR(k:n,k:n)$
+    \ENDFOR
+  \end{algorithmic}
+\end{algorithm}
+\newpage
+
+
+%========================================
+\subsection{Totale Pivotisierung}
+\label{sec:total_pivoting}
+Im Gegensatz zur partiellen Pivotsuche wird bei dieser Methode nicht nur die aktuelle Spalte unter dem aktuellen Pivot-Element, sondern die ganze Blockmatrix darunter, durchsucht. Wird irgendwo in dieser Blockmatrix ein betragsmäßig größeres Element gefunden so tauscht man die Zeilen und Spalten des aktuellen Pivot-Elements und des neu gefundenen betragsmäßig größeren Elements. Ein solches Verfahren resultiert in einer aufwändigeren Pivot-Suche, liefert jedoch bessere Ergebnisse, da die ganze Blockmatrix durchsucht wird und ein eindeutig betragsmäßig größtes Element gefunden wird.
+
+\begin{algorithm}
+\caption{Totale Pivotisierung%
+  \label{alg:total_pivoting}}
+  \begin{algorithmic}[2]
+    % Ein- und Ausgabe
+    \REQUIRE $\bfA\in\mathbb{R}^{n\times n}$ mit $\Rang(\bfA)=n$, $\bfP\in\mathbb{R}^{n\times n}$, $\bfQ\in\mathbb{R}^{n\times n}$.
+    \ENSURE $\bfL\in\mathbb{R}^{n\times n}$ untere Dreiecksmatrix, $\bfR\in\mathbb{R}^{n\times n}$ obere Dreiecksmatrix.
+    % Initialisierung
+    \STATE $[n,n] \leftarrow \textsf{size}(\bfA)$;
+    \STATE $\bfR \leftarrow \bfA$, $\bfL \leftarrow \bfP \leftarrow \bfQ \leftarrow \textsf{eye}(n,n)$;
+    % Schleife
+    \FOR{$k = 1:n-1$}
+      % Finde betragsmäßig maximales Element
+      \STATE $[a_{max},i_{max},j_{max}] \leftarrow \max\limits_{k \leq i \leq n, k \leq j \leq n}\{|a_{i,j}|\}$
+      % Zeilenaustausch
+      \IF{$i_{max} \neq k$}
+        \STATE $\bfR([k\textsf{ }i_{max}],:) \leftarrow \bfR([i_{max}\textsf{ }k],:)$
+        \STATE $\bfP([k\textsf{ }i_{max}],:) \leftarrow \bfP([i_{max}\textsf{ }k],:)$
+      \ENDIF
+      % Spaltenaustausch
+      \IF{$j_{max} \neq k$}
+        \STATE $\bfR(:,[k\textsf{ }j_{max}]) \leftarrow \bfR(:,[j_{max}\textsf{ }k])$
+        \STATE $\bfQ(:,[k\textsf{ }j_{max}]) \leftarrow \bfQ(:,[j_{max}\textsf{ }k])$
+      \ENDIF
+      % Berechnung der Koeffizienten-Spalte in der L-Matrix
+      \STATE $\bfL(k+1:n,k) \leftarrow \bfR(k+1:n,k)/a_{max}$
+      % Berechnung der Zeile in der R-Matrix
+      \STATE $\bfR(k+1:n,k:n) \leftarrow \bfR(k+1:n,k:n) - \bfL(k+1:n,k:n).*\bfR(k:n,k:n)$
+    \ENDFOR
+  \end{algorithmic}
+\end{algorithm}
+\newpage
+
+
+%========================================
+\subsection{Rook Pivotisierung}
+\label{sec:rook_pivoting}
+Die Rook-Pivotisierung ist die neueste aller drei Methoden. Hier, genau wie bei der partiellen Pivot-Suche fängt man mit der aktuellen Spalte an, falls ein betragsmäßig größeres Element als der Betrag des aktuellen Pivot-Elements gefunden wird, wird die Suche horizontal, in der Zeile des betragsmäßig größeren Elements, fortgesetzt. Also, jedes Mal wenn ein betragsmäßig größeres Element gefunden wird, wird die Suche in der Spalte oder Zeile, des neu ausgesuchten Elements, abwechselnd fortgesetzt. Sobald kein betragsmäßig größeres Element gefunden wird, wird das zuletzt gefundene Element als das neue Pivot-Element ausgewählt und die Suche wird in der nächsten Spalte fortgesetzt.
+
+\begin{algorithm}
+\caption{Rook Pivotisierung%
+  \label{alg:rook_pivoting}}
+  \begin{algorithmic}[3]
+    % Ein- und Ausgabe
+    \REQUIRE $\bfA\in\mathbb{R}^{n\times n}$ mit $\Rang(\bfA)=n$, $\bfP\in\mathbb{R}^{n\times n}$, $\bfP\in\mathbb{R}^{n\times n}$.
+    \ENSURE $\bfL\in\mathbb{R}^{n\times n}$ untere Dreiecksmatrix, $\bfR\in\mathbb{R}^{n\times n}$ obere Dreiecksmatrix.
+    % COMMENT , $\bf{PA}=\bf{LR}$.
+    % Initialisierung
+    \STATE $[n,n] \leftarrow \textsf{size}(\bfA)$
+    \STATE $\bfR \leftarrow \bfA$, $\bfL \leftarrow \bfP \leftarrow \textsf{eye}(n,n)$
+    % Schleife
+    \FOR{$k = 1:n-1$}
+      % Finde betragsmäßig maximales Element
+      \STATE $a_{max} \leftarrow a_{kk}$, $[a_{col}, i_{max}] \leftarrow \max\limits_{k \leq i \leq n}\{|a_{i,k}\}|$, $a_{row} \leftarrow it \leftarrow 0$
+      \WHILE{$a_{max} < a_{col}$ or $a_{max} < a_{row}$}
+        \STATE $a_{max} \leftarrow \max\{a_{row}, a_{col}\}$
+        \IF{$it$ is odd}
+        \STATE $[a_{col}, i_{max}] \leftarrow \max\limits_{k \leq i \leq n}\{|a_{i,j_{max}}|\}$
+        \ELSE
+        \STATE $[a_{row}, j_{max}] \leftarrow \max\limits_{k \leq j \leq n}\{|a_{i_{max},j}|\}$
+        \ENDIF
+        \STATE $it++$
+      \ENDWHILE
+      \STATE $a_{max} \leftarrow \max\{a_{row}, a_{col}\}$
+      % Zeilenaustausch
+      \IF{$i_{max} \neq k$}
+        \STATE $\bfR([k\textsf{ }i_{max}],:) \leftarrow \bfR([i_{max}\textsf{ }k],:)$
+        \STATE $\bfP([k\textsf{ }i_{max}],:) \leftarrow \bfP([i_{max}\textsf{ }k],:)$
+      \ENDIF
+      % Spaltenaustausch
+      \IF{$j_{max} \neq k$}
+        \STATE $\bfR(:,[k\textsf{ }j_{max}]) \leftarrow \bfR(:,[j_{max}\textsf{ }k])$
+        \STATE $\bfQ(:,[k\textsf{ }j_{max}]) \leftarrow \bfQ(:,[j_{max}\textsf{ }k])$
+      \ENDIF
+      % Berechnung der Koeffizienten-Spalte in der L-Matrix
+      \STATE $\bfL(k+1:n,k) \leftarrow \bfR(k+1:n,k)/a_{max}$
+      % Berechnung der Zeile in der R-Matrix
+      \STATE $\bfR(k+1:n,k:n) \leftarrow \bfR(k+1:n,k:n) - \bfL(k+1:n,k:n).*\bfR(k:n,k:n)$
+    \ENDFOR
+  \end{algorithmic}
+\end{algorithm}
+\newpage
+
+
+%========================================
+\section{Vergleich}
+\label{sec:comparison}
+Alle drei Verfahren können zur Pivot-Suche eingesetzt werden, haben aber unterschiedliche Charakteristiken, weswegen eine oder andere Methode in unterschiedlichen Fällen bevorzugt wird. Matlab Beispielsweise verwendet die partielle Pivot-Suche für eigene LR-Zerlegung. Partielle Pivotsuche ist die einfachste von allen drei Methoden und hat die geringste Suchkomplexität, die als … abgeschätzt wird, dafür liefert die partielle Pivotsuche nicht immer ein optimales Ergebnis, da nur die aktuelle Spalte durchsucht wird und ein “besseres” Element in einer anderen Spalte verborgen bleiben kann. Dagegen liefert die totale Pivotisierung bestes Suchergebnis, ihr Suchverfahren jedoch ist deutlich aufwändiger als das der partiellen Pivotsuche mit ihrer … Suchkomplexität. Die Rook-Pivotsuche ist die vergleichsweise neue Suchmethode dennoch liefert diese gute Ergebnisse, mit der statistisch nachgewiesenen Suchkomplexität von … ist diese Mehtode beinah so gut wie partielle Pivotsuche und liefert beinah so gute ergebnisse wie totale Pivotsuche. Ist also möglichst akkurates Ergebnis bevorzugt so kann man zu totalen Pivotsuche greifen, braucht man jedoch ein schnelles Suchverfahren steht die partielle Pivotsuche zu Verfügung und möchte man etwas von beiden Welten haben so kann man auf Rook-Pivotsuche zurückgreifen.
+
+
+
+
+
+
+
+
+
+
+
+\addcontentsline{toc}{section}{Literaturverzeichnis}%
+\bibliographystyle{plain}
+\bibliography{Proseminar}
+
+\end{document}
+
+
+% USEFUL
+% -------------------------------
+% \begin{verbatim}
+% >> A = [2 2;2 1;1 0]
+% A =
+%      2     2
+%      2     1
+%      1     0
+% >> [Q,R] = KlassischesGramSchmidtVerfahren(A)
+% Q =
+%      6.666666666666666e-01     6.666666666666667e-01
+%      6.666666666666666e-01    -3.333333333333333e-01
+%      3.333333333333333e-01    -6.666666666666666e-01
+% R =
+%      3     2
+%      0     1
+% >> Q*R
+% ans =
+%      2     2
+%      2     1
+%      1     0
+% >> Q'*Q
+% ans =
+%      1.000000000000000e+00     1.110223024625157e-16
+%      1.110223024625157e-16     1.000000000000000e+00
+% \end{verbatim}
+
+% Mögliches Inhaltsverzeichnis:
+% \begin{enumerate}
+% \item Einführung
+%   \begin{enumerate}
+%   \item Motivation
+%   \item Notation
+%   \end{enumerate}
+% \item Die wesentliche Idee 1
+% \item Die wesentliche Idee 2
+% \item Numerische Beispiele
+% \item Fazit
+% \item Literaturverzeichnis
+% \end{enumerate}
+
+% Beispiel
+% \begin{equation}
+%   \label{eq:eine_erste_abgesetzte_Formel}
+%   \begin{pmatrix}
+%     1 & 2 & 3\\
+%     4 & 5 & 6\\
+%     7 & 8 & 9\\
+%   \end{pmatrix}
+%   \begin{pmatrix}[r]
+%     1 \\ -2 \\ 1\\
+%   \end{pmatrix} =
+%   \begin{pmatrix}
+%     0 \\ 0 \\ 0\\
+%   \end{pmatrix} \quad\Leftrightarrow\quad
+%   \bfA\bfx=\bfo
+% \end{equation}
+
+% \label{alg:CGS}
+% \hyperref[alg:CGS]{Algorithmus~\ref*{alg:CGS}} in \textsc{Matlab}
