@@ -501,7 +501,7 @@ keine weiteren Elemente mehr darunter gibt.
       % Berechnung der Zeile in der R-Matrix
       % \STATE $\bfR(k+1:n,k:n) \leftarrow \bfR(k+1:n,k:n) - diag(\bfL(k+1:n,k:n)) * repmat(\bfR(k,k:n), n-k, 1)$
       \FOR{$l = k:n-1$}
-        \STATE $\bfR(l+1,l:n) \leftarrow \bfR(l+1,l:n) - \bfL(l+1,l) * \bfR(l,l:n)$
+        \STATE $\bfR(l+1,k:n) \leftarrow \bfR(l+1,k:n) - \bfL(l+1,k) * \bfR(k,k:n)$
       \ENDFOR
     \ENDFOR
   \end{algorithmic}
@@ -549,7 +549,7 @@ größtes Element gefunden wird.
       % Berechnung der Zeile in der R-Matrix
       % \STATE $\bfR(k+1:n,k:n) \leftarrow \bfR(k+1:n,k:n) - diag(\bfL(k+1:n,k:n)) * repmat(\bfR(k,k:n), n-k, 1)$
       \FOR{$l = k:n-1$}
-        \STATE $\bfR(l+1,l:n) \leftarrow \bfR(l+1,l:n) - \bfL(l+1,l) * \bfR(l,l:n)$
+        \STATE $\bfR(l+1,k:n) \leftarrow \bfR(l+1,k:n) - \bfL(l+1,k) * \bfR(k,k:n)$
       \ENDFOR
     \ENDFOR
   \end{algorithmic}
@@ -609,7 +609,7 @@ nächsten Spalte fortgesetzt.
       % Berechnung der Zeile in der R-Matrix
       % \STATE $\bfR(k+1:n,k:n) \leftarrow \bfR(k+1:n,k:n) - diag(\bfL(k+1:n,k:n)) * repmat(\bfR(k,k:n), n-k, 1)$
       \FOR{$l = k:n-1$}
-        \STATE $\bfR(l+1,l:n) \leftarrow \bfR(l+1,l:n) - \bfL(l+1,l) * \bfR(l,l:n)$
+        \STATE $\bfR(l+1,k:n) \leftarrow \bfR(l+1,k:n) - \bfL(l+1,k) * \bfR(k,k:n)$
       \ENDFOR
     \ENDFOR
   \end{algorithmic}
