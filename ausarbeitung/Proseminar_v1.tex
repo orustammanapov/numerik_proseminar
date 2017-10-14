@@ -284,12 +284,11 @@
 \fi
 \definecolor{mycolor}{rgb}{.08,.12,.71}
 \hypersetup{%
-  pdftitle     = {Proseminar über numerische lineare Algebra},
+  pdftitle     = {Gaußsches Eliminationsverfahren mit Pivotisierung},
   pdfsubject   = {Proseminar Mathematik},
   pdfkeywords  = {Proseminar, Mathematik, numerische lineare Algebra,
-    TUHH},
-  pdfauthor    = {\textcopyright\ Jens-Peter M. Zemke 2017},
-  baseurl      = {http://www.mat.tuhh.de/home/jpmzemke/},
+    TUHH, Pivotisierung},
+  pdfauthor    = {\textcopyright\ Rustam Magomedov 2017},
   pdfstartview = {FitH},
   pdfview      = {FitH},
   linkcolor    = mycolor,     % links to same page
@@ -353,13 +352,29 @@
 %========================================
 \section{Einführung}
 \label{sec:introduction}
-In dieser Ausarbeitung werden wir uns mit den unterschiedlichen Pivotisierungsverfahren, die in der Numerische Linearen Algebra eine wichtige Rolle spielen, beschäftigen. Dies werden wir mithilfe des im Proseminar vorgestellten Buches (Watkins), des Skripts und mithilfe einiger Internetquellen, die unter dem Literaturverzeichnis aufgelistet sind, tun. Die Ausareitung ist in drei Abschnitte aufgeteilt um die strukturierte Behandlung des Themas zu ermöglichen. Im ersten Abschnitt werden wir erfahren welche Motivation hinter diesen Verfahren steckt und werden ein Paar wichtige Begriffe, die uns im dritten Abschnitt bei der Auswertung helfen werden, kennen lernen. Im zweiten Abschnitt schauen wir uns die Verfahren näher an und machen uns mit den Algorithmen vertraut. Wie schon vorher erwähnt, werden wir im letzten Abschnitt dieser Ausarbeitung die, nun bekannten, Verfahren auswerten und miteinander vergleichen.
+In dieser Ausarbeitung werden wir uns mit den unterschiedlichen Pivotisierungsverfahren, 
+die in der Numerische Linearen Algebra eine wichtige Rolle spielen, beschäftigen. 
+Dies werden wir mithilfe des im Proseminar vorgestellten Buches von Watkins \cite{watkins:pivoting}, 
+des Skripts \cite{zemke:growth} und mithilfe einiger Internetquellen \cite{chemnitz:rounding}, 
+die im Literaturverzeichnis aufgelistet sind, tun. 
+Die Ausarbeitung ist in drei Abschnitte aufgeteilt um die strukturierte Behandlung des Themas 
+zu ermöglichen. Im ersten Abschnitt werden wir erfahren welche Motivation hinter diesen 
+Verfahren steckt und werden ein Paar wichtige Begriffe, die uns im dritten Abschnitt bei 
+der Auswertung helfen werden, kennen lernen. Im zweiten Abschnitt schauen wir uns die 
+Verfahren näher an und machen uns mit den Algorithmen vertraut. Wie schon vorher erwähnt, 
+werden wir im letzten Abschnitt dieser Ausarbeitung die, nun bekannten, Verfahren auswerten 
+und miteinander vergleichen.
 
 
 %========================================
 \subsection{Motivation}
 \label{sec:motivation}
-LR-Zerlegung stellt ein gutes, numerisches Verfahren dar und ist beim lösen eines eindeutig lösbaren Gleichungssystems, wo eine reguläre Matrix auftritt, kaum ersetzbar, jedoch hat auch LR-Zerlegung ihre Nachteile. Ein typisches Beispiel, bei dem LR-Zerlegung nicht anwendbar ist, ist eine reguläre Matrix mit einer Null in der Diagonale, zwar ist diese Matrix regulär, es lässt sich aber trotzdem kein sinnvolles Ergebnis ohne weiteres erschließen. Ein anschauliches Beispiel dazu:
+LR-Zerlegung stellt ein gutes numerisches Verfahren dar und ist beim Lösen eines 
+eindeutig lösbaren Gleichungssystems, wo eine reguläre Matrix auftritt, kaum ersetzbar, 
+jedoch hat auch die LR-Zerlegung ihre Nachteile. Ein typisches Beispiel, bei dem LR-Zerlegung 
+nicht anwendbar ist, ist eine reguläre Matrix mit einer Null in der ersten Komponente, zwar ist 
+diese Matrix regulär, es lässt sich aber trotzdem kein sinnvolles Ergebnis ohne weiteres 
+erschließen. Ein anschauliches Beispiel dazu:
 
 \begin{verbatim}
 >> A = [0 2 -3; 2 2 1; 2 4 4]
@@ -377,7 +392,15 @@ ans = -24
 %========================================
 \subsection{Rechnergenauigkeit}
 \label{sec:precision}
-Ein weiterer Grund, warum es ohne eine weitere Methode nicht geht und neue Lösungsverfahren von essentieller Bedeutung sind, sind die physikalischen Eigenschaften moderner Rechner. Eine reelle Zahl lässt zwar auf dem Blatt Papier verhältnismässig einfach darstellen, wobei es selbst hier sich um eine begrenzte Anzahl der Nachkommastellen handeln muss, sind die Speicherkapazitäten eines Rechners für manche mathematischen Operationen sehr begrenzt. Dies führt wiederum zu kreativen Speicherformaten und einer dieser Formate ist das IEEE-Format. Das IEEE-Format bringt nicht nur bessere Speicherverwaltung mit, indem es erlaubt Gleitkommazahlen besser zu speichern, sondern auch Rundungsfehler, was sich am folgenden Beispiel anschaulich darstellen lässt:
+Ein weiterer Grund, warum es ohne eine weitere Methode nicht geht und neue Lösungsverfahren 
+von essentieller Bedeutung sind, sind die physikalischen Eigenschaften moderner Rechner. 
+Eine reelle Zahl lässt zwar auf dem Blatt Papier verhältnismässig einfach darstellen, 
+wobei es selbst hier sich um eine begrenzte Anzahl der Nachkommastellen handeln muss, 
+sind die Speicherkapazitäten eines Rechners für manche mathematischen Operationen sehr begrenzt. 
+Dies führt wiederum zu neuen Speicherformaten und eines dieser Formate ist das IEEE-Format. 
+Das IEEE-Format bringt nicht nur bessere Speicherverwaltung mit, indem es erlaubt 
+Gleitkommazahlen besser zu speichern, sondern auch Rundungsfehler, was sich am folgenden 
+Beispiel \cite{chemnitz:rounding} anschaulich darstellen lässt:
 
 \begin{equation}
   \bfA=\bfL\bfR
@@ -393,67 +416,93 @@ Ein weiterer Grund, warum es ohne eine weitere Methode nicht geht und neue Lösu
   \begin{pmatrix}
     10^{-20}  & 1 \\
     0         & 1-10^{20} \\
-  \end{pmatrix}
+  \end{pmatrix},
 \end{equation}
 \newline
 
-wo $\bfA$ eine reguläre Matrix mit einer LR-Zerlegung ist, bei der $\bfL$ eine normierte untere und $\bfR$ eine rechte obere Dreiecksmatrix ist.
-In diesem Beispiel entsteht ein Problem bei dem $r_{22}$-Eintrag der $\bfR$-Matrix. Wird man die beiden Matrizen $\bfL$ und $\bfR$ ausmutipliezeren, so wird man nicht auf die ursprüngliche Matrix $\bfA$ kommen, weil der $r_{22}$-Eintrag einen falschen Wert, der durch Rundungsfehler entsteht, liefert.
+\noindent wo $\bfA$ eine reguläre Matrix mit einer LR-Zerlegung ist, bei der $\bfL$ eine normierte 
+untere und $\bfR$ eine rechte obere Dreiecksmatrix ist. In diesem Beispiel entsteht ein Problem 
+bei dem $r_{22}$-Eintrag der $\bfR$-Matrix. Wird man die beiden Matrizen $\bfL$ und $\bfR$ 
+ausmutiplizieren, so wird man nicht auf die ursprüngliche Matrix $\bfA$ kommen, 
+weil der $r_{22}$-Eintrag einen falschen Wert, der durch Rundungsfehler entsteht, liefert.
 
 
 %========================================
 \subsection{Begriffe}
 \label{sec:concepts}
-Um die Störungsempfindlichkeit der Verfahren auszuwerten führen wir neue Begriffe ein, diese Begriffe sollen die Grundlage, die der Auswertung dieser Verfahren dient, bilden. Erster Begriff, den wir einführen ist die Konditionszahl, die ein Maß für die Störungsschwankung des Problems ist, und der zweite Begriff ist die Wachstumsfaktor, und dieser soll als Maß für die Stabilität (Stärke der Störungsschwankung des numerischen Algorithmus).
+Um die Störungsempfindlichkeit der Verfahren auszuwerten führen wir neue Begriffe ein, 
+diese Begriffe sollen die Grundlage, die der Auswertung dieser Verfahren dient, bilden. 
+Der erste Begriff, den wir einführen, ist die Konditionszahl \cite{zemke:growth}, die ein Maß für die 
+Störungsschwankung des Problems ist, und der zweite Begriff ist die Wachstumsfaktor \cite{zemke:growth}, 
+dieser soll als Maß für die Stabilität (Stärke der Störungsschwankung des numerischen 
+Algorithmus).
 \newline
 \newline
 Die Konditionszahl ist definiert als: $$\kappa(A)=\mnorm{A^{-1}}\mnorm{A},$$
 \newline
-wo $\bfA$ eine reguläre Matrix und $\mnorm{\cdot}$ eine definierte Matrixnorm ist, von der die Konditionszahl abhängt.
+wobei $\bfA$ eine reguläre Matrix und $\mnorm{\cdot}$ eine Matrixnorm ist, 
+von der die Konditionszahl abhängt.
 \newline
-Je kleiner ist die Konditionszahl, desto besser. Bei einer Konditionszahl $\epsilon\kappa(A) \sim 1$, wo $\epsilon$ relativer Maschinengenauigkeit ist, kann man keine brauchbare Lösung erwarten
+Je kleiner die Konditionszahl ist, desto besser. 
+Bei einer Konditionszahl $\epsilon\kappa(A) \sim 1$, wobei $\epsilon$ die relative 
+Maschinengenauigkeit ist, kann man keine brauchbare Lösung erwarten.
 \newline
 \newline
-Der Wachstumsfactor ist definiert als: $$\rho_k=^{\max\limits_{i,j} \left|r_{i,j}\right|}/_{\max\limits_{i,j} \left|a_{i,j}\right|},$$
+Der Wachstumsfactor ist definiert als: $$\rho=^{\max\limits_{i,j} \left|r_{i,j}\right|}/_{\max\limits_{i,j} \left|a_{i,j}\right|},$$
 \newline
-wo $k$ für den Algorithmusschritt und $r_{i,j}$ und $a_{i,j}$ für entsprechende Einträge der $\bfA$ und $\bfR$ Matrizen stehen. Dabei gehen wir von der gängigen Konvention aus, bei der $\bfA$ eine reguläre Startmatrix und $\bfR$ eine obere Dreiecksmatrix ist. Auch bei dem Wachstumsfaktor heißt es je kleiner, desto besser.
+wo $k$ für den Algorithmusschritt und $r_{i,j}$ und $a_{i,j}$ für entsprechende Einträge 
+der $\bfA$ und $\bfR$ Matrizen stehen. Dabei gehen wir von der gängigen Konvention aus, 
+bei der $\bfA$ eine reguläre Startmatrix und $\bfR$ eine obere Dreiecksmatrix ist. 
+Auch bei dem Wachstumsfaktor heißt es je kleiner, desto besser.
 \newpage
 
 
 %========================================
 \section{Verfahren}
 \label{sec:methods}
-In diesem Abschnitt der Ausarbeitung machen wir uns mit den drei Pivotisierungsmethoden bekannt und schauen uns die algorithmische Vorgehensweise dieser Methoden.
+In diesem Abschnitt der Ausarbeitung machen wir uns mit den drei Pivotisierungsverfahren 
+bekannt und schauen uns die algorithmische Vorgehensweise dieser Methoden an.
 
 
 %========================================
 \subsection{Partielle Pivotisierung}
 \label{sec:partial_pivoting}
-Die Partielle Pivotisierung, die auch als Spaltenpivotsuche bekannt ist, ist die einfachste und die am meisten verbreitetste Methode der Pivot-Suche. Bei dieser Methode sucht man das betragsmäßig gröste Element, um es mit dem aktuellen Pivot-Element auszutauschen. Die Suche startet in der aktuellen Spalte und unter dem aktuellen Pivot-Element. Findet man das betragsmäßig größere Element, so tauscht man die Zeile mit dem betragsgrößten Element mit der Zeile des aktuellen Pivot-Elements um und speichert die Tauschoperation in einer Pivot-Matrix oder, wenn man es effizienter speichern möchte, in einem Pivot-Vektor. Diese Vorgehensweise wiederholt man solange bis man am letzten Pivot-Element landet, hier hört die Suche auf, da es keine weiteren Elemente mehr darunter gibt.
+Die partielle Pivotisierung \cite{watkins:pivoting}, die auch als Spaltenpivotsuche bekannt ist, ist die 
+einfachste und die am meisten verbreitete Methode der Pivot-Suche. Bei dieser Methode sucht man das 
+betragsmäßig größte Element, um es mit dem aktuellen Pivot-Element auszutauschen. Die Suche 
+startet in der aktuellen Spalte und unter dem aktuellen Pivot-Element. Findet man das 
+betragsmäßig größere Element, so tauscht man die Zeile mit dem betragsgrößten Element mit der 
+Zeile des aktuellen Pivot-Elements um und speichert die Tauschoperation in einer Pivot-Matrix 
+oder, wenn man es effizienter speichern möchte, in einem Pivot-Vektor. Diese Vorgehensweise 
+wiederholt man solange bis man am letzten Pivot-Element landet, hier hört die Suche auf, da es 
+keine weiteren Elemente mehr darunter gibt.
 
 \begin{algorithm}
 \caption{Partielle Pivotisierung%
   \label{alg:partial_pivoting}}
   \begin{algorithmic}[1]
     % Ein- und Ausgabe
-    \REQUIRE $\bfA\in\mathbb{R}^{n\times n}$ mit $\Rang(\bfA)=n$, $\bfP\in\mathbb{R}^{n\times n}$.
-    \ENSURE $\bfL\in\mathbb{R}^{n\times n}$ untere Dreiecksmatrix, $\bfR\in\mathbb{R}^{n\times n}$ obere Dreiecksmatrix.
+    \REQUIRE $\bfA\in\mathbb{R}^{n\times n}$ mit $\Rang(\bfA)=n$.
+    \ENSURE $\bfL\in\mathbb{R}^{n\times n}$ normierte untere Dreiecksmatrix, $\bfR\in\mathbb{R}^{n\times n}$ rechte obere Dreiecksmatrix und orthogonale Permutationsmatrix $\bfP\in\mathbb{R}^{n\times n}$.
     % Initialisierung
     \STATE $[n,n] \leftarrow \textsf{size}(\bfA)$;
     \STATE $\bfR \leftarrow \bfA$, $\bfL \leftarrow \bfP \leftarrow \textsf{eye}(n,n)$;
     % Schleife
     \FOR{$k = 1:n-1$}
       % Finde betragsmäßig maximales Element
-      \STATE $[a_{max},i_{max}] \leftarrow \max\limits_{k \leq i \leq n}\{|a_{i,k}|\}$
+      \STATE $[r_{max},i_{max}] \leftarrow \max\limits_{k \leq i \leq n}\{|r_{i,k}|\}$
       % Zeilenaustausch
       \IF{$i_{max} \neq k$}
         \STATE $\bfR([k\textsf{ }i_{max}],:) \leftarrow \bfR([i_{max}\textsf{ }k],:)$
         \STATE $\bfP([k\textsf{ }i_{max}],:) \leftarrow \bfP([i_{max}\textsf{ }k],:)$
       \ENDIF
       % Berechnung der Koeffizienten-Spalte in der L-Matrix
-      \STATE $\bfL(k+1:n,k) \leftarrow \bfR(k+1:n,k)/a_{max}$
+      \STATE $\bfL(k+1:n,k) \leftarrow \bfR(k+1:n,k)/r_{k,k}$
       % Berechnung der Zeile in der R-Matrix
-      \STATE $\bfR(k+1:n,k:n) \leftarrow \bfR(k+1:n,k:n) - \bfL(k+1:n,k:n).*\bfR(k:n,k:n)$
+      % \STATE $\bfR(k+1:n,k:n) \leftarrow \bfR(k+1:n,k:n) - diag(\bfL(k+1:n,k:n)) * repmat(\bfR(k,k:n), n-k, 1)$
+      \FOR{$l = k:n-1$}
+        \STATE $\bfR(l+1,l:n) \leftarrow \bfR(l+1,l:n) - \bfL(l+1,l) * \bfR(l,l:n)$
+      \ENDFOR
     \ENDFOR
   \end{algorithmic}
 \end{algorithm}
@@ -463,22 +512,28 @@ Die Partielle Pivotisierung, die auch als Spaltenpivotsuche bekannt ist, ist die
 %========================================
 \subsection{Totale Pivotisierung}
 \label{sec:total_pivoting}
-Im Gegensatz zur partiellen Pivotsuche wird bei dieser Methode nicht nur die aktuelle Spalte unter dem aktuellen Pivot-Element, sondern die ganze Blockmatrix darunter, durchsucht. Wird irgendwo in dieser Blockmatrix ein betragsmäßig größeres Element gefunden so tauscht man die Zeilen und Spalten des aktuellen Pivot-Elements und des neu gefundenen betragsmäßig größeren Elements. Ein solches Verfahren resultiert in einer aufwändigeren Pivot-Suche, liefert jedoch bessere Ergebnisse, da die ganze Blockmatrix durchsucht wird und ein eindeutig betragsmäßig größtes Element gefunden wird.
+Im Gegensatz zur partiellen Pivot-Suche wird bei dieser Methode \cite{watkins:pivoting} nicht nur 
+die aktuelle Spalte unter dem aktuellen Pivot-Element, sondern die ganze Blockmatrix darunter durchsucht. 
+Wird irgendwo in dieser Blockmatrix ein betragsmäßig größeres Element gefunden, so tauscht man die 
+Zeilen und Spalten des aktuellen Pivot-Elements und des neu gefundenen betragsmäßig größeren 
+Elements. Ein solches Verfahren resultiert in einer aufwändigeren Pivot-Suche, liefert jedoch 
+bessere Ergebnisse, da die ganze Blockmatrix durchsucht wird und ein betragsmäßig 
+größtes Element gefunden wird.
 
 \begin{algorithm}
 \caption{Totale Pivotisierung%
   \label{alg:total_pivoting}}
   \begin{algorithmic}[2]
     % Ein- und Ausgabe
-    \REQUIRE $\bfA\in\mathbb{R}^{n\times n}$ mit $\Rang(\bfA)=n$, $\bfP\in\mathbb{R}^{n\times n}$, $\bfQ\in\mathbb{R}^{n\times n}$.
-    \ENSURE $\bfL\in\mathbb{R}^{n\times n}$ untere Dreiecksmatrix, $\bfR\in\mathbb{R}^{n\times n}$ obere Dreiecksmatrix.
+    \REQUIRE $\bfA\in\mathbb{R}^{n\times n}$ mit $\Rang(\bfA)=n$.
+    \ENSURE $\bfL\in\mathbb{R}^{n\times n}$ normierte untere Dreiecksmatrix, $\bfR\in\mathbb{R}^{n\times n}$ rechte obere Dreiecksmatrix und orthogonale Permutationsmatrizen $\bfP\in\mathbb{R}^{n\times n}$ und $\bfQ\in\mathbb{R}^{n\times n}$.
     % Initialisierung
     \STATE $[n,n] \leftarrow \textsf{size}(\bfA)$;
     \STATE $\bfR \leftarrow \bfA$, $\bfL \leftarrow \bfP \leftarrow \bfQ \leftarrow \textsf{eye}(n,n)$;
     % Schleife
     \FOR{$k = 1:n-1$}
       % Finde betragsmäßig maximales Element
-      \STATE $[a_{max},i_{max},j_{max}] \leftarrow \max\limits_{k \leq i \leq n, k \leq j \leq n}\{|a_{i,j}|\}$
+      \STATE $[r_{max},i_{max},j_{max}] \leftarrow \max\limits_{k \leq i \leq n, k \leq j \leq n}\{|r_{i,j}|\}$
       % Zeilenaustausch
       \IF{$i_{max} \neq k$}
         \STATE $\bfR([k\textsf{ }i_{max}],:) \leftarrow \bfR([i_{max}\textsf{ }k],:)$
@@ -490,9 +545,12 @@ Im Gegensatz zur partiellen Pivotsuche wird bei dieser Methode nicht nur die akt
         \STATE $\bfQ(:,[k\textsf{ }j_{max}]) \leftarrow \bfQ(:,[j_{max}\textsf{ }k])$
       \ENDIF
       % Berechnung der Koeffizienten-Spalte in der L-Matrix
-      \STATE $\bfL(k+1:n,k) \leftarrow \bfR(k+1:n,k)/a_{max}$
+      \STATE $\bfL(k+1:n,k) \leftarrow \bfR(k+1:n,k)/r_{k,k}$
       % Berechnung der Zeile in der R-Matrix
-      \STATE $\bfR(k+1:n,k:n) \leftarrow \bfR(k+1:n,k:n) - \bfL(k+1:n,k:n).*\bfR(k:n,k:n)$
+      % \STATE $\bfR(k+1:n,k:n) \leftarrow \bfR(k+1:n,k:n) - diag(\bfL(k+1:n,k:n)) * repmat(\bfR(k,k:n), n-k, 1)$
+      \FOR{$l = k:n-1$}
+        \STATE $\bfR(l+1,l:n) \leftarrow \bfR(l+1,l:n) - \bfL(l+1,l) * \bfR(l,l:n)$
+      \ENDFOR
     \ENDFOR
   \end{algorithmic}
 \end{algorithm}
@@ -500,35 +558,42 @@ Im Gegensatz zur partiellen Pivotsuche wird bei dieser Methode nicht nur die akt
 
 
 %========================================
-\subsection{Rook Pivotisierung}
+\subsection{Rook-Pivotisierung}
 \label{sec:rook_pivoting}
-Die Rook-Pivotisierung ist die neueste aller drei Methoden. Hier, genau wie bei der partiellen Pivot-Suche fängt man mit der aktuellen Spalte an, falls ein betragsmäßig größeres Element als der Betrag des aktuellen Pivot-Elements gefunden wird, wird die Suche horizontal, in der Zeile des betragsmäßig größeren Elements, fortgesetzt. Also, jedes Mal wenn ein betragsmäßig größeres Element gefunden wird, wird die Suche in der Spalte oder Zeile, des neu ausgesuchten Elements, abwechselnd fortgesetzt. Sobald kein betragsmäßig größeres Element gefunden wird, wird das zuletzt gefundene Element als das neue Pivot-Element ausgewählt und die Suche wird in der nächsten Spalte fortgesetzt.
+Die Rook-Pivotisierung \cite{zemke:growth} ist die neueste aller drei Methoden. Hier, genau wie bei der partiellen 
+Pivot-Suche fängt man mit der aktuellen Spalte an. Falls ein betragsmäßig größeres Element als 
+der Betrag des aktuellen Pivot-Elements gefunden wird, wird die Suche horizontal in der Zeile 
+des betragsmäßig größeren Elements, fortgesetzt. Also, jedes Mal, wenn ein betragsmäßig größeres 
+Element gefunden wird, wird die Suche in der Spalte oder Zeile des neu ausgesuchten Elements, 
+abwechselnd fortgesetzt. Sobald kein betragsmäßig größeres Element gefunden wird, wird das 
+zuletzt gefundene Element als das neue Pivot-Element ausgewählt und die Suche wird in der 
+nächsten Spalte fortgesetzt.
 
 \begin{algorithm}
-\caption{Rook Pivotisierung%
+\caption{Rook-Pivotisierung%
   \label{alg:rook_pivoting}}
   \begin{algorithmic}[3]
     % Ein- und Ausgabe
-    \REQUIRE $\bfA\in\mathbb{R}^{n\times n}$ mit $\Rang(\bfA)=n$, $\bfP\in\mathbb{R}^{n\times n}$, $\bfP\in\mathbb{R}^{n\times n}$.
-    \ENSURE $\bfL\in\mathbb{R}^{n\times n}$ untere Dreiecksmatrix, $\bfR\in\mathbb{R}^{n\times n}$ obere Dreiecksmatrix.
+    \REQUIRE $\bfA\in\mathbb{R}^{n\times n}$ mit $\Rang(\bfA)=n$.
+    \ENSURE $\bfL\in\mathbb{R}^{n\times n}$ normierte untere Dreiecksmatrix, $\bfR\in\mathbb{R}^{n\times n}$ rechte obere Dreiecksmatrix und orthogonale Permutationsmatrizen $\bfP\in\mathbb{R}^{n\times n}$ und $\bfQ\in\mathbb{R}^{n\times n}$.
     % COMMENT , $\bf{PA}=\bf{LR}$.
     % Initialisierung
     \STATE $[n,n] \leftarrow \textsf{size}(\bfA)$
-    \STATE $\bfR \leftarrow \bfA$, $\bfL \leftarrow \bfP \leftarrow \textsf{eye}(n,n)$
+    \STATE $\bfR \leftarrow \bfA$, $\bfL \leftarrow \bfP \leftarrow \bfQ \leftarrow \textsf{eye}(n,n)$;
     % Schleife
     \FOR{$k = 1:n-1$}
       % Finde betragsmäßig maximales Element
-      \STATE $a_{max} \leftarrow a_{kk}$, $[a_{col}, i_{max}] \leftarrow \max\limits_{k \leq i \leq n}\{|a_{i,k}\}|$, $a_{row} \leftarrow it \leftarrow 0$
-      \WHILE{$a_{max} < a_{col}$ or $a_{max} < a_{row}$}
-        \STATE $a_{max} \leftarrow \max\{a_{row}, a_{col}\}$
+      \STATE $r_{max} \leftarrow r_{kk}$, $[r_{col}, i_{max}] \leftarrow \max\limits_{k \leq i \leq n}\{|r_{i,k}\}|$, $r_{row} \leftarrow it \leftarrow 0$
+      \WHILE{$r_{max} < r_{col}$ or $r_{max} < r_{row}$}
+        \STATE $r_{max} \leftarrow \max\{r_{row}, r_{col}\}$
         \IF{$it$ is odd}
-        \STATE $[a_{col}, i_{max}] \leftarrow \max\limits_{k \leq i \leq n}\{|a_{i,j_{max}}|\}$
+        \STATE $[r_{col}, i_{max}] \leftarrow \max\limits_{k \leq i \leq n}\{|r_{i,j_{max}}|\}$
         \ELSE
-        \STATE $[a_{row}, j_{max}] \leftarrow \max\limits_{k \leq j \leq n}\{|a_{i_{max},j}|\}$
+        \STATE $[r_{row}, j_{max}] \leftarrow \max\limits_{k \leq j \leq n}\{|r_{i_{max},j}|\}$
         \ENDIF
         \STATE $it++$
       \ENDWHILE
-      \STATE $a_{max} \leftarrow \max\{a_{row}, a_{col}\}$
+      \STATE $r_{max} \leftarrow \max\{r_{row}, r_{col}\}$
       % Zeilenaustausch
       \IF{$i_{max} \neq k$}
         \STATE $\bfR([k\textsf{ }i_{max}],:) \leftarrow \bfR([i_{max}\textsf{ }k],:)$
@@ -540,9 +605,12 @@ Die Rook-Pivotisierung ist die neueste aller drei Methoden. Hier, genau wie bei 
         \STATE $\bfQ(:,[k\textsf{ }j_{max}]) \leftarrow \bfQ(:,[j_{max}\textsf{ }k])$
       \ENDIF
       % Berechnung der Koeffizienten-Spalte in der L-Matrix
-      \STATE $\bfL(k+1:n,k) \leftarrow \bfR(k+1:n,k)/a_{max}$
+      \STATE $\bfL(k+1:n,k) \leftarrow \bfR(k+1:n,k)/r_{k,k}$
       % Berechnung der Zeile in der R-Matrix
-      \STATE $\bfR(k+1:n,k:n) \leftarrow \bfR(k+1:n,k:n) - \bfL(k+1:n,k:n).*\bfR(k:n,k:n)$
+      % \STATE $\bfR(k+1:n,k:n) \leftarrow \bfR(k+1:n,k:n) - diag(\bfL(k+1:n,k:n)) * repmat(\bfR(k,k:n), n-k, 1)$
+      \FOR{$l = k:n-1$}
+        \STATE $\bfR(l+1,l:n) \leftarrow \bfR(l+1,l:n) - \bfL(l+1,l) * \bfR(l,l:n)$
+      \ENDFOR
     \ENDFOR
   \end{algorithmic}
 \end{algorithm}
@@ -552,82 +620,52 @@ Die Rook-Pivotisierung ist die neueste aller drei Methoden. Hier, genau wie bei 
 %========================================
 \section{Vergleich}
 \label{sec:comparison}
-Alle drei Verfahren können zur Pivot-Suche eingesetzt werden, haben aber unterschiedliche Charakteristiken, weswegen eine oder andere Methode in unterschiedlichen Fällen bevorzugt wird. Matlab Beispielsweise verwendet die partielle Pivot-Suche für eigene LR-Zerlegung. Partielle Pivotsuche ist die einfachste von allen drei Methoden und hat die geringste Suchkomplexität, die als … abgeschätzt wird, dafür liefert die partielle Pivotsuche nicht immer ein optimales Ergebnis, da nur die aktuelle Spalte durchsucht wird und ein “besseres” Element in einer anderen Spalte verborgen bleiben kann. Dagegen liefert die totale Pivotisierung bestes Suchergebnis, ihr Suchverfahren jedoch ist deutlich aufwändiger als das der partiellen Pivotsuche mit ihrer … Suchkomplexität. Die Rook-Pivotsuche ist die vergleichsweise neue Suchmethode dennoch liefert diese gute Ergebnisse, mit der statistisch nachgewiesenen Suchkomplexität von … ist diese Mehtode beinah so gut wie partielle Pivotsuche und liefert beinah so gute ergebnisse wie totale Pivotsuche. Ist also möglichst akkurates Ergebnis bevorzugt so kann man zu totalen Pivotsuche greifen, braucht man jedoch ein schnelles Suchverfahren steht die partielle Pivotsuche zu Verfügung und möchte man etwas von beiden Welten haben so kann man auf Rook-Pivotsuche zurückgreifen.
+Alle drei Pivotsuchverfahren können zur Pivotsuche eingesetzt werden, haben aber 
+unterschiedliche Charakteristiken, aus diesem Grund wird meistens eine oder andere 
+dieser Methoden in unterschiedlichen Fällen bevorzugt. Matlab verwendet beispielsweise 
+die partielle Pivotsuche für eigene Implementierung der LR-Zerlegung.
+
+
+%========================================
+\subsection{Komplexität}
+\label{sec:complexity}
+Die partielle Pivotsuche ist die einfachste aller dieser drei Methoden und hat die geringste 
+Suchkomplexität, die als $^{n^{2}}/_2 \in O(n^2)$ \cite{poole:cost} abgeschätzt wird, da aber nur die aktuelle 
+Spalte durchsucht wird, liefert die partielle Pivotsuche oft kein optimales Ergebnis. Dagegen 
+liefert die totale Pivotisuche das beste Suchergebnis, jedoch ist dieses Suchverfahren 
+deutlich aufwändiger als die partielle Pivot-Suche. Die Suchkomplexität der totalen Pivotsuche 
+liegt bei $^{n^{3}}/_3 \in O(n^3)$ \cite{poole:cost}. Die Rook-Pivotsuche ist eine vergleichsweise neue 
+Suchmethode, die gute Ergebnisse liefert. Mit der statistisch nachgewiesenen Suchkomplexität 
+von $^{3n^{2}}/_2 \in O(n^2)$ \cite{poole:cost} ist diese Methode beinah so gut wie die partielle Pivotsuche 
+und liefert gute Ergebnisse, die mit den Ergebnissen der totalen Pivotsuche vergleichbar sind.
+
+
+%========================================
+\subsection{Stabilität}
+\label{sec:stability}
+Was die Stabilität angeht, steht die totale Pivotsuche, gefolgt von der Rook-Pivotsuche, mit 
+ihrem Wachstumsfaktor von $\rho^{GETP}_n \leq 2\sqrt{n}n^{\ln(n)/4} \text{ für } n \geq 1$, an 
+der ersten Stelle \cite{zemke:growth}. Das Durchsuchen der ganzen Untermatrix nach einem optimalen Element macht 
+zwar die Suche aufwändig, liefert jedoch das beste Ergebnis und erhöht dadurch die Stabilität 
+des Verfahrens. Die Rook-Pivotsuche, die an der zweiten Stelle steht, besitzt einen Wachstumsfaktor 
+von $\rho^{GERP}_n \leq 1.5n^{3\ln(n)/4} \text{ für } n \geq 1$ \cite{zemke:growth} und zeichnet sich dadurch aus, 
+dass die Suche deutlich einfacher ist als die bei der totalen Pivotsuche und vergleichbar nur mit 
+der Komplexität der partiellen Pivotsuche, die trotz ihrer Instabilität mit ihrem Wachstumsfaktor 
+von $\rho^{GEPP}_n \leq 2^{n-1} \text{ für } n \geq 1$ \cite{zemke:growth} die einfachste aller dieser drei Verfahren ist.
+
+
+%========================================
+\subsection{Fazit}
+\label{sec:summary}
+Ist also möglichst ein optimales Ergebnis bevorzugt, so kann man auf totale Pivotsuche zugreifen, 
+braucht man jedoch ein schnelles Suchverfahren, steht die partielle Pivotsuche zur Verfügung, 
+möchte man aber etwas von den beiden Welten haben, so kann man auf Rook-Pivotsuche zurückgreifen.
 
 
 
-
-
-
-
-
-
-
-
+\newpage
 \addcontentsline{toc}{section}{Literaturverzeichnis}%
 \bibliographystyle{plain}
-\bibliography{Proseminar}
+\bibliography{citations}
 
 \end{document}
-
-
-% USEFUL
-% -------------------------------
-% \begin{verbatim}
-% >> A = [2 2;2 1;1 0]
-% A =
-%      2     2
-%      2     1
-%      1     0
-% >> [Q,R] = KlassischesGramSchmidtVerfahren(A)
-% Q =
-%      6.666666666666666e-01     6.666666666666667e-01
-%      6.666666666666666e-01    -3.333333333333333e-01
-%      3.333333333333333e-01    -6.666666666666666e-01
-% R =
-%      3     2
-%      0     1
-% >> Q*R
-% ans =
-%      2     2
-%      2     1
-%      1     0
-% >> Q'*Q
-% ans =
-%      1.000000000000000e+00     1.110223024625157e-16
-%      1.110223024625157e-16     1.000000000000000e+00
-% \end{verbatim}
-
-% Mögliches Inhaltsverzeichnis:
-% \begin{enumerate}
-% \item Einführung
-%   \begin{enumerate}
-%   \item Motivation
-%   \item Notation
-%   \end{enumerate}
-% \item Die wesentliche Idee 1
-% \item Die wesentliche Idee 2
-% \item Numerische Beispiele
-% \item Fazit
-% \item Literaturverzeichnis
-% \end{enumerate}
-
-% Beispiel
-% \begin{equation}
-%   \label{eq:eine_erste_abgesetzte_Formel}
-%   \begin{pmatrix}
-%     1 & 2 & 3\\
-%     4 & 5 & 6\\
-%     7 & 8 & 9\\
-%   \end{pmatrix}
-%   \begin{pmatrix}[r]
-%     1 \\ -2 \\ 1\\
-%   \end{pmatrix} =
-%   \begin{pmatrix}
-%     0 \\ 0 \\ 0\\
-%   \end{pmatrix} \quad\Leftrightarrow\quad
-%   \bfA\bfx=\bfo
-% \end{equation}
-
-% \label{alg:CGS}
-% \hyperref[alg:CGS]{Algorithmus~\ref*{alg:CGS}} in \textsc{Matlab}
